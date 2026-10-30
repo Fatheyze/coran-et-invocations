@@ -2061,6 +2061,10 @@ sel.addEventListener("change", () => { state.recitateur = Number(sel.value); sto
 const etatDuas = { theme: "", recherche: "" };
 const THEMES_DUAS = [...new Set(INVOCATIONS.map((d) => d.theme))];
 const urlsDua = (d) => d.coran.versets.map((n) => urlVerset({ numSourate: d.coran.sourate, numVerset: n }));
+/* Recueils de hadiths : la référence renvoie à la page du hadith (numérotation courante). */
+const RECUEILS = { "Sahîh Al-Bukhârî": "bukhari", "Sahîh Muslim": "muslim", "Sunan At-Tirmidhî": "tirmidhi", "Sunan Abî Dâwûd": "abudawud", "Abû Dâwûd": "abudawud", "Sunan Ibn Mâjah": "ibnmajah" };
+const sourceDua = (texte) => esc(texte).replace(new RegExp(`(${Object.keys(RECUEILS).join("|")}) (\\d+)`, "g"), (_, nom, num) =>
+  `<a class="underline" href="https://sunnah.com/${RECUEILS[nom]}:${num}" target="_blank" rel="noopener">${nom} ${num}</a>`);
 
 function carteDua(d) {
   const urls = d.coran ? urlsDua(d) : null;
@@ -2081,7 +2085,7 @@ function carteDua(d) {
       <p>« ${esc(d.francais)} »</p>
     </div>
     ${d.note ? `<p class="dua-note">${esc(d.note)}</p>` : ""}
-    <p class="dua-src mt-auto">📖 ${esc(d.source)}</p>
+    <p class="dua-src mt-auto">📖 ${sourceDua(d.source)}</p>
   </article>`;
 }
 
