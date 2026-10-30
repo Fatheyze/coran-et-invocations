@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mots du Coran</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&family=Marcellus&display=swap">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+  /* Mise en page : bandeau nuit étoilé, barre d'outils collante, grille de cartes de vocabulaire. */
+  :root {
+    --bg: #f3f5fa;
+    --surface: #ffffff;
+    --surface-2: #eef1f8;
+    --ink: #0f1b33;
+    --muted: #586480;
+    --line: #dbe1ec;
+    --gold: #9a7019;
+    --gold-strong: #b8892a;
+    --gold-soft: #f3e7c6;
+    --band: #0e1c3a;
+    --band-ink: #f4efe2;
+    --band-gold: #d9b45a;
+    --ok: #1f7a55;
+    --ok-soft: #dcf1e7;
+    --hl: #c8322a;
+    --sig: #0e1c3a;
+    --sig-ink: #ffffff;
+    --ex: #e9edfb;
+    --font-ar: "Amiri", "Scheherazade New", "Traditional Arabic", serif;
+    --font-ui: "Cairo", "Segoe UI", system-ui, sans-serif;
+    --font-display: "Marcellus", "Cairo", Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #08122a; --surface: #0f1d3b; --surface-2: #142449; --ink: #edf0f7; --muted: #9ba8c4;
+      --line: #22345f; --gold: #dcb862; --gold-strong: #e8c56f; --gold-soft: #2f2a1c;
+      --band: #050c1e; --band-ink: #f4efe2; --band-gold: #dcb862; --ok: #5fd3a1; --ok-soft: #133a2e; --hl: #ff7b6e; --sig: #050c1e; --sig-ink: #f2f4fb; --ex: #132350;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #08122a; --surface: #0f1d3b; --surface-2: #142449; --ink: #edf0f7; --muted: #9ba8c4;
+    --line: #22345f; --gold: #dcb862; --gold-strong: #e8c56f; --gold-soft: #2f2a1c;
+    --band: #050c1e; --band-ink: #f4efe2; --band-gold: #dcb862; --ok: #5fd3a1; --ok-soft: #133a2e; --hl: #ff7b6e; --sig: #050c1e; --sig-ink: #f2f4fb; --ex: #132350;
+    color-scheme: dark;
+  }
+
+  html, body { background: var(--bg); color: var(--ink); }
+  body { font-family: var(--font-ui); font-size: 15px; line-height: 1.6; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .ar { font-family: var(--font-ar); direction: rtl; }
+
+  /* Bandeau */
+  .band {
+    background-color: var(--band); color: var(--band-ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23d9b45a' stroke-opacity='.13' stroke-width='1'%3E%3Crect x='17' y='17' width='30' height='30'/%3E%3Crect x='17' y='17' width='30' height='30' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .band h1 { font-family: var(--font-display); text-wrap: balance; letter-spacing: .01em; }
+  .band .eyebrow { color: var(--band-gold); letter-spacing: .14em; text-transform: uppercase; font-size: 12px; font-weight: 700; }
+  .band-btn { border: 1px solid color-mix(in srgb, var(--band-gold) 45%, transparent); color: var(--band-ink); }
+  .band-btn:hover { background: color-mix(in srgb, var(--band-gold) 15%, transparent); }
+  .band select { background: transparent; color: var(--band-ink); }
+  .band select option { color: #0f1b33; }
+
+  /* Barre d'outils */
+  .toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .field { background: var(--surface); border: 1px solid var(--line); color: var(--ink); }
+  .field::placeholder { color: var(--muted); }
+  .field:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .chip { border: 1px solid var(--line); color: var(--muted); background: var(--surface); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .track { background: var(--surface-2); }
+  .fill { background: linear-gradient(90deg, var(--gold), var(--gold-strong)); transition: width .4s ease; }
+  .muted { color: var(--muted); }
+
+  /* Onglets Vocabulaire / Invocations */
+  .tabs { background: var(--band); border-top: 1px solid color-mix(in srgb, var(--band-gold) 25%, transparent); }
+  .tab { flex: 1 1 0; min-width: 0; color: var(--band-ink); font-weight: 700; font-size: 15px; border: 1px solid color-mix(in srgb, var(--band-gold) 45%, transparent); background: color-mix(in srgb, var(--band-ink) 6%, transparent); }
+  .tab:hover { background: color-mix(in srgb, var(--band-gold) 15%, transparent); }
+  .tab[aria-selected="true"] { background: var(--band-gold); color: var(--band); border-color: var(--band-gold); }
+  .tab .ic { display: block; font-size: 20px; line-height: 1.2; }
+
+  /* Cartes d'invocation */
+  .dua-titre { font-family: var(--font-display); font-size: 20px; line-height: 1.3; color: var(--ink); text-wrap: balance; }
+  .rep { font-size: 12px; font-weight: 700; color: var(--gold-strong); border: 1px solid var(--gold); background: var(--gold-soft); white-space: nowrap; }
+  .dua-ar { font-family: var(--font-ar); direction: rtl; font-size: 28px; line-height: 2; text-align: center; color: var(--ink); }
+  .dua-ar .orn { color: var(--gold); font-size: 22px; }
+  .dua-phon { font-style: italic; color: var(--sig); text-align: center; }
+  :root[data-theme="dark"] .dua-phon { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dua-phon { color: var(--gold); } }
+  .dua .sig { padding: 16px 18px; min-height: 0; }
+  .dua .sig p { margin-top: 4px; }
+  .dua-note { border-inline-start: 3px solid var(--gold); padding-inline-start: 12px; font-size: 14px; color: var(--muted); }
+  .dua-src { font-family: var(--font-display); color: var(--sig); font-size: 14px; }
+
+  /* Fiches « Savoir » */
+  .fiche-item { display: grid; grid-template-columns: 34px 1fr auto; gap: 4px 12px; align-items: start; padding-block: 14px; border-top: 1px solid var(--line); }
+  .fiche-item:first-child { border-top: 0; }
+  .fiche-n { font-weight: 700; font-size: 20px; color: var(--gold-strong); line-height: 1.4; }
+  .fiche-nom { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .fiche-nom .ar { font-size: 28px; line-height: 1.4; color: var(--ink); }
+  .fiche-nom .ph { font-weight: 700; color: var(--sig); }
+  :root[data-theme="dark"] .fiche-nom .ph { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fiche-nom .ph { color: var(--gold); } }
+  .fiche-preuve { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .fiche-preuve .ar { font-size: 19px; }
+  .fiche-corr { font-size: 13px; margin-top: 6px; padding: 6px 10px; border-radius: 10px; background: var(--gold-soft); color: var(--ink); }
+  :root[data-theme="dark"] .dua-src { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dua-src { color: var(--gold); } }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* Cartes : en-tête (rang + mot), bandeau « Signification » avec badge, encart « Exemple dans le Coran » */
+  .card { background: var(--surface); border: 1px solid var(--line); transition: border-color .2s; }
+  .card.learned { border-color: color-mix(in srgb, var(--ok) 60%, var(--line)); }
+  .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .rank { font-family: var(--font-ui); font-weight: 700; font-size: 40px; line-height: 1; color: var(--sig); flex: none; font-variant-numeric: lining-nums tabular-nums; }
+  :root[data-theme="dark"] .rank { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rank { color: var(--gold); } }
+  .forms { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 20px; direction: rtl; min-width: 0; }
+  .form { display: flex; flex-direction: column; align-items: center; }
+  .word { font-family: var(--font-ar); font-size: 40px; line-height: 1.4; color: var(--ink); }
+  .form.main .word { font-size: 48px; }
+  .form .tag { color: var(--gold); font-weight: 700; font-size: 12px; }
+  .phon { color: var(--sig); font-size: 14px; direction: ltr; }
+  :root[data-theme="dark"] .phon { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .phon { color: var(--gold); } }
+  .sig { border: 1px solid var(--line); }
+  .sig { position: relative; background: var(--sig); color: var(--sig-ink); padding: 16px 92px 16px 18px; min-height: 96px; }
+  .sig h3, .ex h3 { font-family: var(--font-display); font-size: 17px; letter-spacing: .02em; }
+  .sig ul { list-style: disc; padding-inline-start: 18px; margin-top: 4px; }
+  .sig .formes { font-family: var(--font-ar); direction: rtl; font-size: 18px; opacity: .85; margin-top: 4px; }
+  .badge {
+    position: absolute; top: 50%; right: -10px; transform: translateY(-50%);
+    width: 92px; height: 92px; border-radius: 50%; display: grid; place-content: center; text-align: center;
+    background: var(--surface); color: var(--sig); border: 3px double var(--sig);
+    box-shadow: 0 0 0 4px var(--surface);
+  }
+  :root[data-theme="dark"] .badge { color: var(--gold); border-color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge { color: var(--gold); border-color: var(--gold); } }
+  .badge b { font-family: var(--font-display); font-size: 24px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .badge span { font-size: 9.5px; line-height: 1.15; font-weight: 700; margin-top: 2px; }
+  .ex { background: var(--ex); }
+  .ex h3 { color: var(--sig); }
+  :root[data-theme="dark"] .ex h3 { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ex h3 { color: var(--gold); } }
+  .ex .ar { font-family: var(--font-ar); direction: rtl; font-size: 25px; line-height: 1.9; text-align: center; }
+  .ex .orn { color: var(--gold); font-size: 22px; }
+  .ex mark { background: transparent; color: var(--hl); font-weight: 700; }
+  .ex .ref { font-family: var(--font-display); color: var(--sig); }
+  :root[data-theme="dark"] .ex .ref { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ex .ref { color: var(--gold); } }
+  .decomp { border: 1px solid var(--line); }
+  .decomp summary { cursor: pointer; font-family: var(--font-display); font-size: 17px; color: var(--sig); list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .decomp summary::-webkit-details-marker { display: none; }
+  .decomp summary::after { content: "＋"; color: var(--gold); }
+  .decomp[open] summary::after { content: "－"; }
+  :root[data-theme="dark"] .decomp summary { color: var(--gold); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .decomp summary { color: var(--gold); } }
+  .tiles { display: flex; flex-wrap: wrap; gap: 8px; direction: rtl; margin-top: 12px; }
+  .tile { background: var(--surface-2); border: 1px solid var(--line); min-width: 70px; padding: 6px 8px 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .tile .l { font-family: var(--font-ar); font-size: 34px; line-height: 1.5; color: var(--ink); }
+  .tile .n { font-size: 12px; font-weight: 700; direction: ltr; }
+  .tile .v { font-size: 11px; color: var(--muted); direction: ltr; line-height: 1.3; }
+  .tile .s { font-size: 13px; color: var(--hl); font-weight: 700; direction: ltr; }
+  .tile.muet { opacity: .6; }
+  .root { display: flex; gap: 6px; direction: rtl; }
+  .root span { font-family: var(--font-ar); font-size: 22px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--gold-soft); color: var(--ink); border: 1px solid var(--gold); }
+  .ar-inline { font-family: var(--font-ar); font-size: 1.15em; }
+  .pending { border: 1px dashed var(--line); color: var(--muted); }
+  .theme-tag { color: var(--muted); font-size: 12px; }
+  .play {
+    width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--gold); color: var(--band); transition: transform .15s, background .15s;
+  }
+  .play:hover { transform: scale(1.06); }
+  .play.small { width: 36px; height: 36px; }
+  .play[data-playing="true"] { background: var(--hl); color: #fff; }
+  .learn-btn { border: 1px solid var(--line); color: var(--muted); }
+  .learn-btn[aria-pressed="true"] { background: var(--ok-soft); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); max-width: calc(100% - 32px); z-index: 20; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="gutter mx-auto max-w-6xl" style="padding-block: 28px 30px;">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="min-w-0">
+        <p class="eyebrow">Vocabulaire coranique · par fréquence</p>
+        <h1 class="text-3xl sm:text-4xl mt-1">Les mots qui reviennent le plus</h1>
+        <p class="mt-2 max-w-xl opacity-80">Apprenez d'abord les mots les plus fréquents du Coran. Écoutez chaque mot, puis un verset récité où il apparaît.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <label for="reciter" class="sr-only">Récitateur</label>
+        <select id="reciter" class="band-btn rounded-full px-3 py-2 text-sm"></select>
+        <button id="themeBtn" class="band-btn rounded-full px-4 py-2 text-sm" type="button" aria-label="Changer de thème">Thème</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Sections">
+  <div class="gutter mx-auto max-w-6xl flex gap-2 sm:gap-3" role="tablist" style="padding-block: 12px 14px;">
+    <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="mots" aria-selected="true"><span class="ic" aria-hidden="true">📖</span>Vocabulaire</button>
+    <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="duas" aria-selected="false"><span class="ic" aria-hidden="true">🤲</span>Invocations</button>
+    <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="savoir" aria-selected="false"><span class="ic" aria-hidden="true">💡</span>Savoir</button>
+  </div>
+</nav>
+
+<div id="vueMots">
+<div class="toolbar">
+  <div class="gutter mx-auto max-w-6xl flex flex-wrap items-center gap-3" style="padding-block: 12px;">
+    <div class="w-full min-w-0">
+      <label for="search" class="sr-only">Rechercher un mot</label>
+      <input id="search" type="search" autocomplete="off" class="field w-full rounded-xl px-4 py-2.5"
+             placeholder="Rechercher : arabe, phonétique ou français (ex. رب, rabb, Seigneur)">
+    </div>
+    <div class="flex gap-2 min-w-0 w-full sm:w-auto">
+      <label for="themeFiltre" class="sr-only">Thème</label>
+      <select id="themeFiltre" class="field rounded-xl px-3 py-2 text-sm min-w-0 flex-1"><option value="">Tous les thèmes</option></select>
+      <label for="tri" class="sr-only">Ordre</label>
+      <select id="tri" class="field rounded-xl px-3 py-2 text-sm min-w-0 flex-1">
+        <option value="rang">Ordre de la liste</option>
+        <option value="freq">Plus fréquents d'abord</option>
+      </select>
+    </div>
+    <div class="flex gap-2" role="group" aria-label="Filtrer">
+      <button class="chip rounded-full px-3 py-1.5 text-sm" data-filter="all" aria-pressed="true" type="button">Tous</button>
+      <button class="chip rounded-full px-3 py-1.5 text-sm" data-filter="todo" aria-pressed="false" type="button">À apprendre</button>
+      <button class="chip rounded-full px-3 py-1.5 text-sm" data-filter="done" aria-pressed="false" type="button">Appris</button>
+    </div>
+    <div class="w-full md:w-72 md:ml-auto min-w-0">
+      <div class="flex justify-between text-sm">
+        <span><b id="learnedCount" class="num">0</b> <span class="muted">/ <span id="totalCount" class="num">0</span> mots appris</span></span>
+        <b id="pct" class="num" style="color: var(--gold)">0 %</b>
+      </div>
+      <div class="track h-2 rounded-full mt-1 overflow-hidden" role="progressbar" aria-label="Progression" aria-valuemin="0" aria-valuemax="100" id="bar">
+        <div class="fill h-full rounded-full" id="barFill" style="width:0%"></div>
+      </div>
+      <p class="muted text-xs mt-1 num" id="coverage"></p>
+    </div>
+  </div>
+</div>
+
+<main class="gutter mx-auto max-w-6xl" style="padding-block: 24px 48px;">
+  <p id="empty" class="muted text-center py-16" hidden>Aucun mot ne correspond à votre recherche.</p>
+  <div id="grid" class="grid gap-6 lg:grid-cols-2"></div>
+  <div class="text-center mt-6"><button id="plus" class="chip rounded-full px-5 py-2 text-sm font-semibold" type="button" hidden>Afficher plus de mots</button></div>
+  <p class="muted text-xs mt-8 max-w-3xl">
+    Les occurrences sont indicatives et varient selon la méthode de comptage. Les mots sans verset viennent du livret « 80 % des mots du Qour'ân » (Al-Lawh) : leur verset et leur audio seront ajoutés au fur et à mesure.
+    Versets : récitation du récitateur choisi (everyayah.com). Mots : récitation mot à mot de quran.com.
+  </p>
+  <p id="noteLien" class="muted text-xs mt-2 max-w-3xl" hidden>Dans cet aperçu, chaque bouton ▶ ouvre la récitation dans un nouvel onglet. Ouvrez le fichier index.html dans votre navigateur pour l'écouter directement dans la page.</p>
+</main>
+</div>
+
+<div id="vueDuas" hidden>
+<div class="toolbar">
+  <div class="gutter mx-auto max-w-6xl flex flex-col gap-3" style="padding-block: 12px;">
+    <div class="w-full min-w-0">
+      <label for="searchDuas" class="sr-only">Rechercher une invocation</label>
+      <input id="searchDuas" type="search" autocomplete="off" class="field w-full rounded-xl px-4 py-2.5"
+             placeholder="Rechercher : arabe, phonétique ou français (ex. pardon, rabbanâ, رب)">
+    </div>
+    <div id="themesDuas" class="flex flex-wrap gap-2" role="group" aria-label="Thèmes des invocations"></div>
+  </div>
+</div>
+<main class="gutter mx-auto max-w-6xl" style="padding-block: 24px 48px;">
+  <p id="emptyDuas" class="muted text-center py-16" hidden>Aucune invocation ne correspond à votre recherche.</p>
+  <div id="gridDuas" class="grid gap-6 lg:grid-cols-2"></div>
+  <p class="muted text-xs mt-8 max-w-3xl">Quand l'invocation est un verset, le bouton ▶ joue sa récitation par le récitateur choisi. Les références renvoient aux recueils de hadiths (numérotation courante).</p>
+</main>
+</div>
+
+<div id="vueSavoir" hidden>
+<main class="gutter mx-auto max-w-6xl" style="padding-block: 24px 48px;">
+  <p class="muted max-w-3xl mb-6">Des fiches pour mieux connaître sa religion, avec les noms en arabe, leur phonétique et la preuve dans le Coran ou la Sunna.</p>
+  <div id="gridSavoir" class="grid gap-6"></div>
+</main>
+</div>
+
+<div id="toast" class="toast rounded-xl px-4 py-3 text-sm shadow-lg" role="status" hidden></div>
+
+<script>
+/* =====================================================================
+   DONNÉES : ajoutez vos mots ici.
+   - rang         : numéro affiché (#1, #2...), unique pour chaque mot
+   - theme        : thème du mot (sert au filtre « Tous les thèmes »)
+   - racine       : (optionnel) lettres racines, ex. "ر ب ب"
+   - formation    : (optionnel) explication de la formation du mot
+                    (les lettres du mot sont décomposées automatiquement)
+   - variantes    : (optionnel) autres formes affichées à côté du mot,
+                    ex. [{ arabe: "أَيَّام", phonetique: "èyyèèm", note: "p." }]
+   - arabe        : le mot avec ses voyelles (tashkil)
+   - phonetique   : prononciation à la française
+   - occurrences  : nombre de mentions dans le Coran
+   - sens         : signification en français
+   - formes       : (optionnel) autres formes du mot
+   - motAudio     : position du mot dans un verset (sourate, verset, position)
+                    pour la récitation mot à mot de quran.com
+   - audioMot     : (optionnel) URL d'un mp3 pour le mot, prioritaire sur motAudio
+   - verset       : (optionnel) exemple. "surligner" = la partie du verset à mettre en rouge
+                    (doit être copiée exactement depuis "arabe").
+   L'audio du verset est construit automatiquement à partir de
+   numSourate + numVerset et du récitateur choisi.
+   ===================================================================== */
+const VOCABULAIRE = [
+  {
+    rang: 1,
+    theme: "Noms d'Allah et qualificatifs",
+    motAudio: { sourate: 112, verset: 1, position: 3 },
+    arabe: "اللَّهُ",
+    phonetique: "Allah",
+    occurrences: 2704,
+    sens: "Nom propre pour désigner Dieu absolu, l'Unique, le Créateur de toute chose.",
+    racine: "ء ل ه",
+    formation: "Selon de nombreux grammairiens : l'article الْ + إِلَٰه (divinité), contractés en اللَّه, « LA divinité », le Seul digne d'adoration. Le lâm est doublé par la chadda et se prononce avec emphase.",
+    verset: {
+      arabe: "قُلْ هُوَ اللَّهُ أَحَدٌ",
+      surligner: "اللَّهُ",
+      traduction: "Dis : « Il est Allah, Unique. »",
+      sourate: "Al-Ikhlâs", numSourate: 112, numVerset: 1
+    }
+  },
+  {
+    rang: 2,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 67, verset: 1, position: 2 },
+    arabe: "الَّذِي",
+    phonetique: "éllèdhii",
+    variantes: [{ arabe: "الَّتِي", phonetique: "èllètii" }, { arabe: "اللَّذَانِ", phonetique: "èllèdhèènii" }, { arabe: "اللَّاتِي", phonetique: "èllèètii" }, { arabe: "الَّذِينَ", phonetique: "èllèdhiinè" }],
+    occurrences: 1467,
+    sens: "Pronoms relatifs : celui qui, ce que. Le mot regroupe toutes ses formes (masculin, féminin, duel, pluriel).",
+    formation: "Mot-outil sans racine : l'article الْ + ذِي. Le lâm de l'article porte la chadda, d'où « alladhî ». Il change selon le genre et le nombre : الَّتِي (fém.), اللَّذَانِ (duel), الَّذِينَ (masc. pl.).",
+    verset: {
+      arabe: "تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ",
+      surligner: "الَّذِي",
+      traduction: "Béni soit Celui dans la main de qui est la royauté, et Il est Omnipotent.",
+      sourate: "Al-Mulk", numSourate: 67, numVerset: 1
+    }
+  },
+  {
+    rang: 3,
+    theme: "Noms d'Allah et qualificatifs",
+    motAudio: { sourate: 1, verset: 2, position: 3 },
+    arabe: "رَبّ",
+    phonetique: "rabb",
+    variantes: [{ arabe: "أَرْبَاب", phonetique: "èrbèèb", note: "p." }],
+    occurrences: 975,
+    sens: "Seigneur, Maître, Celui qui crée, nourrit et fait grandir.",
+    racine: "ر ب ب",
+    formation: "Les deux derniers bâ' de la racine fusionnent en un seul bâ' avec chadda. Idée de la racine : élever, prendre soin, éduquer. Pluriel أَرْبَاب sur le schème أَفْعَال.",
+    verset: {
+      arabe: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
+      surligner: "رَبِّ",
+      traduction: "Louange à Allah, Seigneur des mondes.",
+      sourate: "Al-Fâtiha", numSourate: 1, numVerset: 2
+    }
+  },
+  {
+    rang: 4,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 99, verset: 7, position: 1 },
+    arabe: "مَنْ",
+    phonetique: "mèn",
+    occurrences: 824,
+    sens: "Celui qui, ceux qui ; qui ?",
+    formation: "Mot-outil de deux lettres : mîm + noûn sans voyelle. Avec fatha (mèn) il signifie « qui » ; avec kasra, مِنْ (min) signifie « de ».",
+    verset: {
+      arabe: "فَمَن يَعْمَلْ مِثْقَالَ ذَرَّةٍ خَيْرًا يَرَهُ",
+      surligner: "فَمَن",
+      traduction: "Quiconque fait un bien du poids d'un atome le verra.",
+      sourate: "Az-Zalzala", numSourate: 99, numVerset: 7
+    }
+  },
+  {
+    rang: 5,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 2, verset: 2, position: 1 },
+    arabe: "ذَلِكَ",
+    phonetique: "dhèèlikè",
+    variantes: [{ arabe: "تِلْكَ", phonetique: "tilkè" }, { arabe: "أُولَئِكَ", phonetique: "oulèè-ikè" }],
+    occurrences: 724,
+    sens: "Démonstratifs éloignés : celui-là, celle-là, ceux-là ; cela",
+    formation: "Trois éléments : ذَا (ce) + لِ (lâm d'éloignement) + كَ (kâf : la personne à qui l'on parle). Littéralement « ce, là-bas, vers toi ». Même construction pour تِلْكَ : تِي + لْ + كَ.",
+    verset: {
+      arabe: "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ",
+      surligner: "ذَٰلِكَ",
+      traduction: "C'est le Livre au sujet duquel il n'y a aucun doute, c'est un guide pour les pieux.",
+      sourate: "Al-Baqara", numSourate: 2, numVerset: 2
+    }
+  },
+  {
+    rang: 6,
+    theme: "Création et signes d'Allah",
+    motAudio: { sourate: 99, verset: 1, position: 3 },
+    arabe: "أَرْض",
+    phonetique: "arḍ",
+    occurrences: 461,
+    sens: "La terre, le sol, un pays.",
+    racine: "ء ر ض",
+    formation: "Trois lettres racines sur le schème فَعْل (a-r-ḍ). Le mot est féminin en arabe, même sans tâ' marbouta.",
+    verset: {
+      arabe: "إِذَا زُلْزِلَتِ الْأَرْضُ زِلْزَالَهَا",
+      surligner: "الْأَرْضُ",
+      traduction: "Quand la terre tremblera d'un violent tremblement.",
+      sourate: "Az-Zalzala", numSourate: 99, numVerset: 1
+    }
+  },
+  {
+    rang: 7,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 1, verset: 4, position: 2 },
+    arabe: "يَوْم",
+    phonetique: "yawm",
+    variantes: [{ arabe: "أَيَّام", phonetique: "èyyèèm", note: "p." }],
+    occurrences: 405,
+    sens: "Jour. Souvent le Jour dernier, le Jour de la Rétribution.",
+    racine: "ي و م",
+    formation: "Schème فَعْل : ya-w-m, le wâw sans voyelle forme la diphtongue « aw ». Pluriel أَيَّام sur le schème أَفْعَال.",
+    verset: {
+      arabe: "مَالِكِ يَوْمِ الدِّينِ",
+      surligner: "يَوْمِ",
+      traduction: "Maître du Jour de la Rétribution.",
+      sourate: "Al-Fâtiha", numSourate: 1, numVerset: 4
+    }
+  },
+  {
+    rang: 8,
+    theme: "Personnes",
+    motAudio: { sourate: 71, verset: 2, position: 2 },
+    arabe: "قَوْم",
+    phonetique: "qawm",
+    occurrences: 383,
+    sens: "Peuple, gens, communauté.",
+    racine: "ق و م",
+    formation: "Même racine que قَامَ (se lever) et قِيَامَة (résurrection). Le peuple, ce sont ceux qui se dressent ensemble. Schème فَعْل : qa-w-m.",
+    verset: {
+      arabe: "قَالَ يَا قَوْمِ إِنِّي لَكُمْ نَذِيرٌ مُّبِينٌ",
+      surligner: "قَوْمِ",
+      traduction: "Il dit : « Ô mon peuple, je suis pour vous un avertisseur clair. »",
+      sourate: "Nûh", numSourate: 71, numVerset: 2
+    }
+  },
+  {
+    rang: 9,
+    theme: "Création et signes d'Allah",
+    motAudio: { sourate: 26, verset: 8, position: 4 },
+    arabe: "آيَة",
+    phonetique: "âya",
+    variantes: [{ arabe: "آيَات", phonetique: "èèyèèt", note: "p." }],
+    occurrences: 382,
+    sens: "Signe ; verset du Coran.",
+    racine: "ء ي ي",
+    formation: "Le آ (alif madda) = hamza + alif long, prononcé « 'â ». Le ة final (tâ' marbouta) marque le féminin : « t » en liaison, « h » à la pause. Pluriel آيَات.",
+    formes: "آيَة · آيَات",
+    verset: {
+      arabe: "إِنَّ فِي ذَٰلِكَ لَآيَةً ۖ وَمَا كَانَ أَكْثَرُهُم مُّؤْمِنِينَ",
+      surligner: "لَآيَةً",
+      traduction: "Voilà bien là un signe ! Mais la plupart d'entre eux ne croient pas.",
+      sourate: "Ash-Shu'arâ'", numSourate: 26, numVerset: 8
+    }
+  },
+  {
+    rang: 10,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 55, verset: 26, position: 1 },
+    arabe: "كُلّ",
+    phonetique: "koull",
+    occurrences: 358,
+    sens: "Tout, tous ; chaque, chacun",
+    racine: "ك ل ل",
+    formation: "Les deux lâm de la racine fusionnent en un lâm avec chadda : « koull ». Suivi d'un nom indéfini, il veut dire « chaque » ; d'un nom défini, « tout le ».",
+    verset: {
+      arabe: "كُلُّ مَنْ عَلَيْهَا فَانٍ",
+      surligner: "كُلُّ",
+      traduction: "Tout ce qui est sur elle (la terre) disparaîtra.",
+      sourate: "Ar-Rahmân", numSourate: 55, numVerset: 26
+    }
+  },
+  {
+    rang: 11,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 114, verset: 6, position: 1 },
+    arabe: "مِنْ",
+    phonetique: "min",
+    occurrences: 3215,
+    sens: "De, parmi, à partir de. La préposition la plus fréquente du Coran.",
+    formes: "مِنْ · مِنَ · مِمَّا · مِنْهُ",
+    verset: {
+      arabe: "مِنَ الْجِنَّةِ وَالنَّاسِ",
+      surligner: "مِنَ",
+      traduction: "Qu'il soit djinn ou humain.",
+      sourate: "An-Nâs", numSourate: 114, numVerset: 6
+    }
+  },
+  {
+    rang: 12,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 109, verset: 2, position: 1 },
+    arabe: "لَا",
+    phonetique: "lâ",
+    occurrences: 1800,
+    sens: "Non, ne… pas. Sert à nier et à interdire.",
+    verset: {
+      arabe: "لَا أَعْبُدُ مَا تَعْبُدُونَ",
+      surligner: "لَا",
+      traduction: "Je n'adore pas ce que vous adorez.",
+      sourate: "Al-Kâfirûn", numSourate: 109, numVerset: 2
+    }
+  },
+  {
+    rang: 13,
+    theme: "Verbes",
+    motAudio: { sourate: 20, verset: 25, position: 1 },
+    arabe: "قَالَ",
+    phonetique: "qâla",
+    occurrences: 1725,
+    sens: "Il a dit. Le verbe le plus fréquent du Coran, avec toutes ses formes.",
+    racine: "ق و ل",
+    formes: "قَالَ · يَقُولُ · قُلْ · قَالُوا",
+    verset: {
+      arabe: "قَالَ رَبِّ اشْرَحْ لِي صَدْرِي",
+      surligner: "قَالَ",
+      traduction: "Moïse dit : « Seigneur, ouvre-moi ma poitrine. »",
+      sourate: "Tâ-Hâ", numSourate: 20, numVerset: 25
+    }
+  },
+  {
+    rang: 14,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 95, verset: 4, position: 4 },
+    arabe: "فِي",
+    phonetique: "fî",
+    occurrences: 1702,
+    sens: "Dans, en.",
+    verset: {
+      arabe: "لَقَدْ خَلَقْنَا الْإِنسَانَ فِي أَحْسَنِ تَقْوِيمٍ",
+      surligner: "فِي",
+      traduction: "Nous avons certes créé l'homme dans la forme la plus parfaite.",
+      sourate: "At-Tîn", numSourate: 95, numVerset: 4
+    }
+  },
+  {
+    rang: 15,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 103, verset: 2, position: 1 },
+    arabe: "إِنَّ",
+    phonetique: "inna",
+    occurrences: 1700,
+    sens: "Certes, en vérité. Particule qui renforce l'affirmation.",
+    formes: "إِنَّ · إِنَّهُ · إِنَّا · إِنِّي",
+    verset: {
+      arabe: "إِنَّ الْإِنسَانَ لَفِي خُسْرٍ",
+      surligner: "إِنَّ",
+      traduction: "L'homme est certes en perdition.",
+      sourate: "Al-'Asr", numSourate: 103, numVerset: 2
+    }
+  },
+  {
+    rang: 16,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 97, verset: 2, position: 3 },
+    arabe: "مَا",
+    phonetique: "mâ",
+    occurrences: 1500,
+    sens: "Ce que, quoi ; aussi « ne… pas » selon le contexte.",
+    verset: {
+      arabe: "وَمَا أَدْرَاكَ مَا لَيْلَةُ الْقَدْرِ",
+      surligner: "مَا لَيْلَةُ",
+      traduction: "Et qui te dira ce qu'est la Nuit du Destin ?",
+      sourate: "Al-Qadr", numSourate: 97, numVerset: 2
+    }
+  },
+  {
+    rang: 17,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 86, verset: 8, position: 2 },
+    arabe: "عَلَىٰ",
+    phonetique: "'alâ",
+    occurrences: 1380,
+    sens: "Sur, au-dessus de ; contre.",
+    verset: {
+      arabe: "إِنَّهُ عَلَىٰ رَجْعِهِ لَقَادِرٌ",
+      surligner: "عَلَىٰ",
+      traduction: "Allah est certes capable de le ressusciter.",
+      sourate: "At-Târiq", numSourate: 86, numVerset: 8
+    }
+  },
+  {
+    rang: 18,
+    theme: "Verbes",
+    motAudio: { sourate: 17, verset: 81, position: 8 },
+    arabe: "كَانَ",
+    phonetique: "kâna",
+    occurrences: 1358,
+    sens: "Il était, il fut. Verbe « être » au passé, très utilisé pour décrire un état durable.",
+    racine: "ك و ن",
+    formes: "كَانَ · يَكُونُ · كُنْتُمْ · كُونُوا",
+    verset: {
+      arabe: "وَقُلْ جَاءَ الْحَقُّ وَزَهَقَ الْبَاطِلُ ۚ إِنَّ الْبَاطِلَ كَانَ زَهُوقًا",
+      surligner: "كَانَ",
+      traduction: "Et dis : « La Vérité est venue et le Faux a disparu. Le Faux est voué à disparaître. »",
+      sourate: "Al-Isrâ'", numSourate: 17, numVerset: 81
+    }
+  },
+  {
+    rang: 19,
+    theme: "Verbes",
+    motAudio: { sourate: 84, verset: 25, position: 3 },
+    arabe: "آمَنَ",
+    phonetique: "âmana",
+    occurrences: 879,
+    sens: "Croire, avoir la foi. Le nombre compte toute la famille du mot (îmân, mu'min...).",
+    racine: "ء م ن",
+    formes: "آمَنَ · آمَنُوا · إِيمَان · مُؤْمِن",
+    verset: {
+      arabe: "إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ لَهُمْ أَجْرٌ غَيْرُ مَمْنُونٍ",
+      surligner: "آمَنُوا",
+      traduction: "Sauf ceux qui croient et accomplissent les bonnes œuvres : à eux une récompense jamais interrompue.",
+      sourate: "Al-Inshiqâq", numSourate: 84, numVerset: 25
+    }
+  },
+  {
+    rang: 20,
+    theme: "Verbes",
+    motAudio: { sourate: 96, verset: 5, position: 5 },
+    arabe: "عَلِمَ",
+    phonetique: "'alima",
+    occurrences: 854,
+    sens: "Savoir, connaître. Le nombre compte toute la famille du mot ('ilm, 'alîm...).",
+    racine: "ع ل م",
+    formes: "عَلِمَ · يَعْلَمُ · عِلْم · عَلِيم",
+    verset: {
+      arabe: "عَلَّمَ الْإِنسَانَ مَا لَمْ يَعْلَمْ",
+      surligner: "يَعْلَمْ",
+      traduction: "Il a enseigné à l'homme ce qu'il ne savait pas.",
+      sourate: "Al-'Alaq", numSourate: 96, numVerset: 5
+    }
+  },
+  {
+    rang: 21,
+    theme: "Pronoms et particules",
+    motAudio: { sourate: 96, verset: 8, position: 2 },
+    arabe: "إِلَىٰ",
+    phonetique: "ilâ",
+    occurrences: 742,
+    sens: "Vers, jusqu'à.",
+    verset: {
+      arabe: "إِنَّ إِلَىٰ رَبِّكَ الرُّجْعَىٰ",
+      surligner: "إِلَىٰ",
+      traduction: "C'est vers ton Seigneur qu'est le retour.",
+      sourate: "Al-'Alaq", numSourate: 96, numVerset: 8
+    }
+  },
+  {
+    rang: 22,
+    theme: "Verbes",
+    motAudio: { sourate: 109, verset: 1, position: 3 },
+    arabe: "كَفَرَ",
+    phonetique: "kafara",
+    occurrences: 525,
+    sens: "Mécroire, renier. Le nombre compte toute la famille du mot (kufr, kâfir...).",
+    racine: "ك ف ر",
+    formes: "كَفَرَ · كَفَرُوا · كَافِر · كُفْر",
+    verset: {
+      arabe: "قُلْ يَا أَيُّهَا الْكَافِرُونَ",
+      surligner: "الْكَافِرُونَ",
+      traduction: "Dis : « Ô vous les mécréants ! »",
+      sourate: "Al-Kâfirûn", numSourate: 109, numVerset: 1
+    }
+  },
+  {
+    rang: 23,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 84, verset: 24, position: 2 },
+    arabe: "عَذَاب",
+    phonetique: "'adhâb",
+    occurrences: 373,
+    sens: "Châtiment, tourment.",
+    racine: "ع ذ ب",
+    verset: {
+      arabe: "فَبَشِّرْهُم بِعَذَابٍ أَلِيمٍ",
+      surligner: "بِعَذَابٍ",
+      traduction: "Annonce-leur donc un châtiment douloureux.",
+      sourate: "Al-Inshiqâq", numSourate: 84, numVerset: 24
+    }
+  },
+  {
+    rang: 24,
+    theme: "Verbes",
+    motAudio: { sourate: 78, verset: 10, position: 1 },
+    arabe: "جَعَلَ",
+    phonetique: "ja'ala",
+    occurrences: 345,
+    sens: "Faire, rendre, placer.",
+    racine: "ج ع ل",
+    formes: "جَعَلَ · جَعَلْنَا · يَجْعَلُ",
+    verset: {
+      arabe: "وَجَعَلْنَا اللَّيْلَ لِبَاسًا",
+      surligner: "وَجَعَلْنَا",
+      traduction: "Et Nous avons fait de la nuit un vêtement.",
+      sourate: "An-Naba'", numSourate: 78, numVerset: 10
+    }
+  },
+  {
+    rang: 25,
+    theme: "Personnes",
+    motAudio: { sourate: 26, verset: 107, position: 3 },
+    arabe: "رَسُول",
+    phonetique: "rasûl",
+    occurrences: 332,
+    sens: "Messager, envoyé.",
+    racine: "ر س ل",
+    formes: "رَسُول · رُسُل",
+    verset: {
+      arabe: "إِنِّي لَكُمْ رَسُولٌ أَمِينٌ",
+      surligner: "رَسُولٌ",
+      traduction: "Je suis pour vous un messager digne de confiance.",
+      sourate: "Ash-Shu'arâ'", numSourate: 26, numVerset: 107
+    }
+  },
+  {
+    rang: 26,
+    theme: "Création et signes d'Allah",
+    motAudio: { sourate: 82, verset: 1, position: 2 },
+    arabe: "سَمَاء",
+    phonetique: "samâ'",
+    occurrences: 310,
+    sens: "Ciel. Au pluriel « samâwât » : les cieux.",
+    racine: "س م و",
+    formes: "سَمَاء · سَمَاوَات",
+    verset: {
+      arabe: "إِذَا السَّمَاءُ انفَطَرَتْ",
+      surligner: "السَّمَاءُ",
+      traduction: "Quand le ciel se rompra.",
+      sourate: "Al-Infitâr", numSourate: 82, numVerset: 1
+    }
+  },
+  {
+    rang: 27,
+    theme: "Personnes",
+    motAudio: { sourate: 91, verset: 7, position: 1 },
+    arabe: "نَفْس",
+    phonetique: "nafs",
+    occurrences: 295,
+    sens: "Âme, soi, personne.",
+    racine: "ن ف س",
+    formes: "نَفْس · أَنْفُس · نُفُوس",
+    verset: {
+      arabe: "وَنَفْسٍ وَمَا سَوَّاهَا",
+      surligner: "وَنَفْسٍ",
+      traduction: "Et par l'âme et Celui qui l'a harmonieusement façonnée.",
+      sourate: "Ash-Shams", numSourate: 91, numVerset: 7
+    }
+  },
+  {
+    rang: 28,
+    theme: "Verbes",
+    motAudio: { sourate: 110, verset: 1, position: 2 },
+    arabe: "جَاءَ",
+    phonetique: "jâ'a",
+    occurrences: 284,
+    sens: "Venir, arriver.",
+    racine: "ج ي ء",
+    formes: "جَاءَ · جَاءَهُمْ · جِئْتُمْ",
+    verset: {
+      arabe: "إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ",
+      surligner: "جَاءَ",
+      traduction: "Lorsque vient le secours d'Allah ainsi que la victoire.",
+      sourate: "An-Nasr", numSourate: 110, numVerset: 1
+    }
+  },
+  {
+    rang: 29,
+    theme: "Création et signes d'Allah",
+    motAudio: { sourate: 54, verset: 49, position: 3 },
+    arabe: "شَيْء",
+    phonetique: "shay'",
+    occurrences: 283,
+    sens: "Chose, quelque chose.",
+    racine: "ش ي ء",
+    verset: {
+      arabe: "إِنَّا كُلَّ شَيْءٍ خَلَقْنَاهُ بِقَدَرٍ",
+      surligner: "شَيْءٍ",
+      traduction: "Nous avons créé toute chose avec mesure.",
+      sourate: "Al-Qamar", numSourate: 54, numVerset: 49
+    }
+  },
+  {
+    rang: 30,
+    theme: "Verbes",
+    motAudio: { sourate: 1, verset: 5, position: 2 },
+    arabe: "عَبَدَ",
+    phonetique: "'abada",
+    occurrences: 275,
+    sens: "Adorer. Le nombre compte toute la famille du mot ('ibâda, 'abd...).",
+    racine: "ع ب د",
+    formes: "عَبَدَ · نَعْبُدُ · عَبْد · عِبَاد",
+    verset: {
+      arabe: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",
+      surligner: "نَعْبُدُ",
+      traduction: "C'est Toi que nous adorons, et c'est Toi dont nous implorons le secours.",
+      sourate: "Al-Fâtiha", numSourate: 1, numVerset: 5
+    }
+  },
+  {
+    rang: 31,
+    theme: "Verbes",
+    motAudio: { sourate: 96, verset: 1, position: 5 },
+    arabe: "خَلَقَ",
+    phonetique: "khalaqa",
+    occurrences: 261,
+    sens: "Créer.",
+    racine: "خ ل ق",
+    formes: "خَلَقَ · خَلَقْنَا · يَخْلُقُ · خَلْق",
+    verset: {
+      arabe: "اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ",
+      surligner: "خَلَقَ",
+      traduction: "Lis, au nom de ton Seigneur qui a créé.",
+      sourate: "Al-'Alaq", numSourate: 96, numVerset: 1
+    }
+  },
+  {
+    rang: 32,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 6, verset: 155, position: 2 },
+    arabe: "كِتَاب",
+    phonetique: "kitèèb",
+    occurrences: 261,
+    sens: "Livre, écrit ; souvent le Livre révélé",
+    racine: "ك ت ب",
+    verset: {
+      arabe: "وَهَٰذَا كِتَابٌ أَنزَلْنَاهُ مُبَارَكٌ فَاتَّبِعُوهُ وَاتَّقُوا لَعَلَّكُمْ تُرْحَمُونَ",
+      surligner: "كِتَابٌ",
+      traduction: "Et voici un Livre béni que Nous avons fait descendre : suivez-le donc et soyez pieux, afin de recevoir la miséricorde.",
+      sourate: "Al-An'âm", numSourate: 6, numVerset: 155
+    }
+  },
+  {
+    rang: 33,
+    theme: "Personnes",
+    motAudio: { sourate: 114, verset: 1, position: 4 },
+    arabe: "نَاس",
+    phonetique: "nâs",
+    occurrences: 241,
+    sens: "Les gens, les hommes, l'humanité.",
+    racine: "ن و س",
+    verset: {
+      arabe: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
+      surligner: "النَّاسِ",
+      traduction: "Dis : « Je cherche protection auprès du Seigneur des hommes. »",
+      sourate: "An-Nâs", numSourate: 114, numVerset: 1
+    }
+  },
+  {
+    rang: 34,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 89, verset: 30, position: 2 },
+    arabe: "جَنَّة",
+    phonetique: "janna",
+    occurrences: 147,
+    sens: "Jardin ; le Paradis.",
+    racine: "ج ن ن",
+    formes: "جَنَّة · جَنَّات",
+    verset: {
+      arabe: "وَادْخُلِي جَنَّتِي",
+      surligner: "جَنَّتِي",
+      traduction: "Et entre dans Mon Paradis.",
+      sourate: "Al-Fajr", numSourate: 89, numVerset: 30
+    }
+  },
+  {
+    rang: 35,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 101, verset: 11, position: 1 },
+    arabe: "نَار",
+    phonetique: "nâr",
+    occurrences: 145,
+    sens: "Feu ; l'Enfer.",
+    racine: "ن و ر",
+    verset: {
+      arabe: "نَارٌ حَامِيَةٌ",
+      surligner: "نَارٌ",
+      traduction: "C'est un Feu ardent.",
+      sourate: "Al-Qâri'a", numSourate: 101, numVerset: 11
+    }
+  },
+  {
+    rang: 36,
+    theme: "Personnes",
+    motAudio: { sourate: 26, verset: 89, position: 5 },
+    arabe: "قَلْب",
+    phonetique: "qalb",
+    occurrences: 130,
+    sens: "Cœur.",
+    racine: "ق ل ب",
+    formes: "قَلْب · قُلُوب",
+    verset: {
+      arabe: "إِلَّا مَنْ أَتَى اللَّهَ بِقَلْبٍ سَلِيمٍ",
+      surligner: "بِقَلْبٍ",
+      traduction: "Sauf celui qui vient à Allah avec un cœur sain.",
+      sourate: "Ash-Shu'arâ'", numSourate: 26, numVerset: 89
+    }
+  },
+  {
+    rang: 37,
+    theme: "Création et signes d'Allah",
+    motAudio: { sourate: 87, verset: 16, position: 4 },
+    arabe: "دُنْيَا",
+    phonetique: "dunyâ",
+    occurrences: 115,
+    sens: "Ce bas monde, la vie d'ici-bas.",
+    racine: "د ن و",
+    verset: {
+      arabe: "بَلْ تُؤْثِرُونَ الْحَيَاةَ الدُّنْيَا",
+      surligner: "الدُّنْيَا",
+      traduction: "Mais vous préférez plutôt la vie présente.",
+      sourate: "Al-A'lâ", numSourate: 87, numVerset: 16
+    }
+  },
+  {
+    rang: 38,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 93, verset: 4, position: 1 },
+    arabe: "آخِرَة",
+    phonetique: "âkhira",
+    occurrences: 115,
+    sens: "L'au-delà, la vie dernière.",
+    racine: "ء خ ر",
+    verset: {
+      arabe: "وَلَلْآخِرَةُ خَيْرٌ لَّكَ مِنَ الْأُولَىٰ",
+      surligner: "وَلَلْآخِرَةُ",
+      traduction: "La vie dernière t'est certes meilleure que la vie présente.",
+      sourate: "Ad-Duhâ", numSourate: 93, numVerset: 4
+    }
+  },
+  {
+    rang: 39,
+    theme: "Noms d'Allah et qualificatifs",
+    motAudio: { sourate: 1, verset: 3, position: 2 },
+    arabe: "رَحِيم",
+    phonetique: "raḥîm",
+    occurrences: 114,
+    sens: "Très Miséricordieux. Un des noms d'Allah.",
+    racine: "ر ح م",
+    verset: {
+      arabe: "الرَّحْمَٰنِ الرَّحِيمِ",
+      surligner: "الرَّحِيمِ",
+      traduction: "Le Tout Miséricordieux, le Très Miséricordieux.",
+      sourate: "Al-Fâtiha", numSourate: 1, numVerset: 3
+    }
+  },
+  {
+    rang: 40,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 107, verset: 5, position: 4 },
+    arabe: "صَلَاة",
+    phonetique: "ṣalât",
+    occurrences: 99,
+    sens: "La prière.",
+    racine: "ص ل و",
+    verset: {
+      arabe: "الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ",
+      surligner: "صَلَاتِهِمْ",
+      traduction: "Qui sont distraits de leur prière.",
+      sourate: "Al-Mâ'ûn", numSourate: 107, numVerset: 5
+    }
+  },
+  {
+    rang: 41,
+    theme: "Religion, foi et actes",
+    motAudio: { sourate: 97, verset: 4, position: 2 },
+    arabe: "مَلَك",
+    phonetique: "malak",
+    occurrences: 88,
+    sens: "Ange.",
+    racine: "م ل ك",
+    formes: "مَلَك · مَلَائِكَة",
+    verset: {
+      arabe: "تَنَزَّلُ الْمَلَائِكَةُ وَالرُّوحُ فِيهَا بِإِذْنِ رَبِّهِم مِّن كُلِّ أَمْرٍ",
+      surligner: "الْمَلَائِكَةُ",
+      traduction: "Durant celle-ci descendent les Anges ainsi que l'Esprit, par permission de leur Seigneur pour tout ordre.",
+      sourate: "Al-Qadr", numSourate: 97, numVerset: 4
+    }
+  },
+
+  // ---- Mots du livret « 80 % des mots du Qour'ân » (Al-Lawh) : verset et audio à compléter ----
+  { rang: 42, theme: "Pronoms et particules", arabe: "هَذَا", sens: "Ceci, cela, celui-ci (proche, masc.)" },
+  { rang: 43, theme: "Pronoms et particules", arabe: "هَذِهِ", sens: "Ceci, celle-ci ; ces (proche, fém. ou pluriel inanimé)" },
+  { rang: 44, theme: "Pronoms et particules", arabe: "هَؤُلَاءِ", sens: "Ceux-ci, celles-ci, ces" },
+  { rang: 45, theme: "Pronoms et particules", arabe: "لَا إِلَهَ", sens: "[Nulle] divinité" },
+  { rang: 46, theme: "Pronoms et particules", arabe: "إِلَّا اللَّهُ", sens: "[Excepté] Allah" },
+  { rang: 47, theme: "Pronoms et particules", arabe: "كَلَّا", sens: "Certainement pas, jamais" },
+  { rang: 48, theme: "Pronoms et particules", arabe: "لَنْ", sens: "Ne… pas (futur)" },
+  { rang: 49, theme: "Pronoms et particules", arabe: "لَمْ", sens: "Ne… pas (passé)" },
+  { rang: 50, theme: "Pronoms et particules", arabe: "لَيْسَ", sens: "N'être pas, ne… pas" },
+  { rang: 51, theme: "Pronoms et particules", arabe: "بَلَى", sens: "Bien sûr, certainement, mais oui !" },
+  { rang: 52, theme: "Pronoms et particules", arabe: "غَيْرُ", sens: "Autre, sans, sauf, hormis" },
+  { rang: 53, theme: "Pronoms et particules", arabe: "دُونَ", sens: "Au-dessous de, moins que, sans" },
+  { rang: 54, theme: "Pronoms et particules", arabe: "إِلَّا", sens: "Sauf, excepté, à part" },
+  { rang: 55, theme: "Pronoms et particules", arabe: "نَعَمْ", sens: "Oui (acquiescement)" },
+  { rang: 56, theme: "Pronoms et particules", arabe: "هُوَ", sens: "Il" },
+  { rang: 57, theme: "Pronoms et particules", arabe: "هُمْ", sens: "Ils" },
+  { rang: 58, theme: "Pronoms et particules", arabe: "أَنْتَ", sens: "Tu (masc.)" },
+  { rang: 59, theme: "Pronoms et particules", arabe: "أَنْتُمْ", sens: "Vous" },
+  { rang: 60, theme: "Pronoms et particules", arabe: "أَنَا", sens: "Je" },
+  { rang: 61, theme: "Pronoms et particules", arabe: "نَحْنُ", sens: "Nous (aussi « nous » de majesté pour Allah)" },
+  { rang: 62, theme: "Pronoms et particules", arabe: "هِيَ", sens: "Elle ; ils/elles (pluriel inanimé)" },
+  { rang: 63, theme: "Pronoms et particules", arabe: "هُنَّ", sens: "Elles" },
+  { rang: 64, theme: "Pronoms et particules", arabe: "أَنْتِ", sens: "Tu (fém.)" },
+  { rang: 65, theme: "Pronoms et particules", arabe: "هُمَا", sens: "Eux deux" },
+  { rang: 66, theme: "Pronoms et particules", arabe: "أَنْتُمَا", sens: "Vous deux" },
+  { rang: 67, theme: "Pronoms et particules", arabe: "فَوْقَ", sens: "Au-dessus de", occurrences: 41 },
+  { rang: 68, theme: "Pronoms et particules", arabe: "تَحْتَ", sens: "Sous", occurrences: 51 },
+  { rang: 69, theme: "Pronoms et particules", arabe: "بَيْنَ يَدَيْهِ", sens: "Entre les mains, devant, proche", occurrences: 29 },
+  { rang: 70, theme: "Pronoms et particules", arabe: "خَلْف", sens: "Derrière, après, à la suite", occurrences: 22 },
+  { rang: 71, theme: "Pronoms et particules", arabe: "أَمَام", sens: "Devant", occurrences: 1 },
+  { rang: 72, theme: "Pronoms et particules", arabe: "وَرَاء", sens: "Derrière", occurrences: 24 },
+  { rang: 73, theme: "Pronoms et particules", arabe: "يَمِين", sens: "À droite, droite", occurrences: 31 },
+  { rang: 74, theme: "Pronoms et particules", arabe: "شِمَال", sens: "À gauche", occurrences: 10 },
+  { rang: 75, theme: "Pronoms et particules", arabe: "بَيْنَ", sens: "Entre", occurrences: 266 },
+  { rang: 76, theme: "Pronoms et particules", arabe: "حَوْل", sens: "Autour", occurrences: 15 },
+  { rang: 77, theme: "Pronoms et particules", arabe: "حَيْثُ", sens: "Où, là où, à l'endroit où, lorsque", occurrences: 31 },
+  { rang: 78, theme: "Pronoms et particules", arabe: "أَيْنَ", sens: "Où ?, où que", occurrences: 19 },
+  { rang: 79, theme: "Pronoms et particules", arabe: "مَتَى", sens: "Quand ? Lorsque" },
+  { rang: 80, theme: "Pronoms et particules", arabe: "كَيْفَ", sens: "Comment ?" },
+  { rang: 81, theme: "Pronoms et particules", arabe: "كَمْ", sens: "Combien ?" },
+  { rang: 82, theme: "Pronoms et particules", arabe: "أَيُّ", sens: "Lequel, laquelle" },
+  { rang: 83, theme: "Pronoms et particules", arabe: "أَنَّى", sens: "D'où ? Comment ? Pourquoi ?" },
+  { rang: 84, theme: "Pronoms et particules", arabe: "هَلْ", sens: "Est-ce que ?" },
+  { rang: 85, theme: "Pronoms et particules", arabe: "مَاذَا", sens: "Qu'est-ce que ?" },
+  { rang: 86, theme: "Pronoms et particules", arabe: "لِمَاذَا", sens: "Pourquoi ?" },
+  { rang: 87, theme: "Pronoms et particules", arabe: "لَوْلَا", sens: "Si… ne pas ; si ce n'est… alors" },
+  { rang: 88, theme: "Pronoms et particules", arabe: "ذُو", sens: "Qui a, détenteur de, doué de" },
+  { rang: 89, theme: "Pronoms et particules", arabe: "ذَات", sens: "Qui a, détentrice de, douée de" },
+  { rang: 90, theme: "Pronoms et particules", arabe: "أُولُو", sens: "Qui ont, détenteurs de, doués de" },
+  { rang: 91, theme: "Pronoms et particules", arabe: "أَهْل", sens: "Gens de, habitants, peuple, proches" },
+  { rang: 92, theme: "Pronoms et particules", arabe: "آل", sens: "Famille, proches, peuple" },
+  { rang: 93, theme: "Pronoms et particules", arabe: "أَلَا", sens: "N'est-ce pas ?" },
+  { rang: 94, theme: "Pronoms et particules", arabe: "نِعْمَ", sens: "Quel excellent… !" },
+  { rang: 95, theme: "Pronoms et particules", arabe: "بِئْسَ", sens: "Quel mauvais… !" },
+  { rang: 96, theme: "Pronoms et particules", arabe: "بِئْسَمَا", sens: "Comme est détestable ce que…" },
+  { rang: 97, theme: "Pronoms et particules", arabe: "مِثْل", sens: "Quelque chose de semblable à" },
+  { rang: 98, theme: "Pronoms et particules", arabe: "مَثَل", sens: "Exemple, parabole, ressemblance" },
+  { rang: 99, theme: "Pronoms et particules", arabe: "مِمَّنْ", sens: "De qui, à qui, de celui qui" },
+  { rang: 100, theme: "Pronoms et particules", arabe: "قَبْل", sens: "Avant" },
+  { rang: 101, theme: "Pronoms et particules", arabe: "بَعْد", sens: "Après" },
+  { rang: 102, theme: "Pronoms et particules", arabe: "حِين", sens: "Temps, période, au moment où" },
+  { rang: 103, theme: "Pronoms et particules", arabe: "إِذْ", sens: "Quand, lorsque (passé)" },
+  { rang: 104, theme: "Pronoms et particules", arabe: "إِذَا", sens: "Quand, lorsque (futur)" },
+  { rang: 105, theme: "Pronoms et particules", arabe: "أَيَّانَ", sens: "Quand ? (futur)" },
+  { rang: 106, theme: "Pronoms et particules", arabe: "ثُمَّ", sens: "Puis, ensuite" },
+  { rang: 107, theme: "Pronoms et particules", arabe: "فَ", sens: "Puis, donc, alors" },
+  { rang: 108, theme: "Pronoms et particules", arabe: "بَلْ", sens: "Bien plus, au contraire" },
+  { rang: 109, theme: "Pronoms et particules", arabe: "عِنْدَ", sens: "Auprès de, avec, chez", occurrences: 197 },
+  { rang: 110, theme: "Pronoms et particules", arabe: "لَدَى", sens: "Auprès de, chez", occurrences: 20 },
+  { rang: 111, theme: "Pronoms et particules", arabe: "لَدُنْ", sens: "Auprès de, de la part de", occurrences: 18 },
+  { rang: 112, theme: "Pronoms et particules", arabe: "إِنْ… إِلَّا", sens: "Ce n'est que, rien d'autre que" },
+  { rang: 113, theme: "Pronoms et particules", arabe: "أَلَّا", sens: "Que… ne pas, pour ne pas" },
+  { rang: 114, theme: "Pronoms et particules", arabe: "بِمَا", sens: "Par quoi, avec quoi" },
+  { rang: 115, theme: "Pronoms et particules", arabe: "عَمَّا", sens: "À propos de, au sujet de" },
+  { rang: 116, theme: "Pronoms et particules", arabe: "فِيمَا", sens: "Dans ce que" },
+  { rang: 117, theme: "Pronoms et particules", arabe: "كَمَا", sens: "Comme, tel que" },
+  { rang: 118, theme: "Pronoms et particules", arabe: "لِمَا", sens: "Pour ce que, en raison de" },
+  { rang: 119, theme: "Pronoms et particules", arabe: "مِمَّا", sens: "De ce que, ce qui" },
+  { rang: 120, theme: "Pronoms et particules", arabe: "أَمَّا", sens: "Quant à" },
+  { rang: 121, theme: "Pronoms et particules", arabe: "إِمَّا", sens: "Soit… soit, ou bien" },
+  { rang: 122, theme: "Pronoms et particules", arabe: "أَنَّمَا", sens: "Que (seulement)" },
+  { rang: 123, theme: "Pronoms et particules", arabe: "إِنَّمَا", sens: "Certainement, seulement" },
+  { rang: 124, theme: "Pronoms et particules", arabe: "كَأَنَّمَا", sens: "Comme si" },
+  { rang: 125, theme: "Pronoms et particules", arabe: "كُلَّمَا", sens: "À chaque fois" },
+  { rang: 126, theme: "Pronoms et particules", arabe: "بِ", sens: "Avec, grâce à, à cause de" },
+  { rang: 127, theme: "Pronoms et particules", arabe: "عَنْ", sens: "À propos de, de" },
+  { rang: 128, theme: "Pronoms et particules", arabe: "كَ", sens: "Comme, semblable à" },
+  { rang: 129, theme: "Pronoms et particules", arabe: "لِ", sens: "Pour, afin de" },
+  { rang: 130, theme: "Pronoms et particules", arabe: "تَاللَّهِ", sens: "Par Allah (serment)" },
+  { rang: 131, theme: "Pronoms et particules", arabe: "حَتَّى", sens: "Jusqu'à ce que" },
+  { rang: 132, theme: "Pronoms et particules", arabe: "مَعَ", sens: "Avec" },
+  { rang: 133, theme: "Pronoms et particules", arabe: "وَ", sens: "Et" },
+  { rang: 134, theme: "Pronoms et particules", arabe: "قَدْ", sens: "Déjà, certes (+ verbe au passé)" },
+  { rang: 135, theme: "Pronoms et particules", arabe: "سَ", sens: "Futur proche (+ verbe au présent)" },
+  { rang: 136, theme: "Pronoms et particules", arabe: "سَوْفَ", sens: "Futur lointain" },
+  { rang: 137, theme: "Pronoms et particules", arabe: "لَقَدْ", sens: "En effet, certes" },
+  { rang: 138, theme: "Pronoms et particules", arabe: "الْ", sens: "Le, la, les (article)" },
+  { rang: 139, theme: "Pronoms et particules", arabe: "أَمْ", sens: "Ou, ou bien" },
+  { rang: 140, theme: "Pronoms et particules", arabe: "أَوْ", sens: "Ou, ou bien" },
+  { rang: 141, theme: "Pronoms et particules", arabe: "بَعْض", sens: "Quelques, certains, une partie de" },
+  { rang: 142, theme: "Pronoms et particules", arabe: "أَنَّ", sens: "Que (certitude)" },
+  { rang: 143, theme: "Pronoms et particules", arabe: "كَأَنَّ", sens: "Comme si" },
+  { rang: 144, theme: "Pronoms et particules", arabe: "لَكِنَّ", sens: "Mais, cependant" },
+  { rang: 145, theme: "Pronoms et particules", arabe: "لَعَلَّ", sens: "Peut-être, afin que" },
+  { rang: 146, theme: "Pronoms et particules", arabe: "أَنْ", sens: "Que" },
+  { rang: 147, theme: "Pronoms et particules", arabe: "إِنْ", sens: "Si (conditionnel)" },
+  { rang: 148, theme: "Pronoms et particules", arabe: "إِيَّا", sens: "Pronom isolé auquel s'ajoutent les autres pronoms (إِيَّاكَ : Toi)" },
+  { rang: 149, theme: "Pronoms et particules", arabe: "عَسَى", sens: "Peut-être, il se peut que" },
+  { rang: 150, theme: "Pronoms et particules", arabe: "لَمَّا", sens: "Lorsque, quand" },
+  { rang: 151, theme: "Pronoms et particules", arabe: "لَوْ", sens: "Si (conditionnel)" },
+  { rang: 152, theme: "Pronoms et particules", arabe: "يَا أَيُّهَا", sens: "Ô ! (interjection)" },
+  { rang: 153, theme: "Noms d'Allah et qualificatifs", arabe: "الْخَبِيرُ", sens: "Le Parfaitement Informé, le Connaisseur de toutes choses", racine: "خ ب ر", occurrences: 45 },
+  { rang: 154, theme: "Noms d'Allah et qualificatifs", arabe: "الرَّحْمَٰنُ", sens: "Le Tout Miséricordieux", racine: "ر ح م", occurrences: 57 },
+  { rang: 155, theme: "Noms d'Allah et qualificatifs", arabe: "السَّلَامُ", sens: "La Paix, le Pacifique", racine: "س ل م", occurrences: 42 },
+  { rang: 156, theme: "Noms d'Allah et qualificatifs", arabe: "السَّمِيعُ", sens: "Celui qui entend tout", racine: "س م ع", occurrences: 47 },
+  { rang: 157, theme: "Noms d'Allah et qualificatifs", arabe: "الشَّكُورُ", sens: "Le Reconnaissant, plein de gratitude", racine: "ش ك ر", occurrences: 10 },
+  { rang: 158, theme: "Noms d'Allah et qualificatifs", arabe: "الْعَزِيزُ", sens: "Le Tout-Puissant", racine: "ع ز ز", occurrences: 101 },
+  { rang: 159, theme: "Noms d'Allah et qualificatifs", arabe: "الْغَفُورُ", sens: "Le Pardonneur", racine: "غ ف ر", occurrences: 91 },
+  { rang: 160, theme: "Noms d'Allah et qualificatifs", arabe: "الْقَدِيرُ", sens: "L'Omnipotent, capable de toute chose", racine: "ق د ر", occurrences: 45 },
+  { rang: 161, theme: "Noms d'Allah et qualificatifs", arabe: "نَذِير", sens: "Avertisseur, avertissement", racine: "ن ذ ر", occurrences: 58 },
+  { rang: 162, theme: "Noms d'Allah et qualificatifs", arabe: "النَّصِيرُ", sens: "Le Secoureur, le Protecteur", racine: "ن ص ر", occurrences: 24 },
+  { rang: 163, theme: "Noms d'Allah et qualificatifs", arabe: "الْوَكِيلُ", sens: "Le Garant, Celui qui a la charge de tout", racine: "و ك ل", occurrences: 24 },
+  { rang: 164, theme: "Noms d'Allah et qualificatifs", arabe: "أَوَّل", sens: "Premier (fém. أُولَى)", racine: "ء و ل", occurrences: 82 },
+  { rang: 165, theme: "Noms d'Allah et qualificatifs", arabe: "آخِر", sens: "Dernier (fém. آخِرَة)", racine: "ء خ ر", occurrences: 155 },
+  { rang: 166, theme: "Noms d'Allah et qualificatifs", arabe: "آخَر", sens: "Autre (fém. أُخْرَى, pl. آخَرُونَ)", racine: "ء خ ر", occurrences: 70 },
+  { rang: 167, theme: "Noms d'Allah et qualificatifs", arabe: "أَمِين", sens: "Digne de confiance, loyal", racine: "ء م ن", occurrences: 14 },
+  { rang: 168, theme: "Noms d'Allah et qualificatifs", arabe: "الْبَصِيرُ", sens: "Le Clairvoyant ; voyant, lucide", racine: "ب ص ر", occurrences: 51 },
+  { rang: 169, theme: "Noms d'Allah et qualificatifs", arabe: "بَعِيد", sens: "Loin", racine: "ب ع د", occurrences: 25 },
+  { rang: 170, theme: "Noms d'Allah et qualificatifs", arabe: "التَّوَّابُ", sens: "Celui qui accepte le repentir ; repentant", racine: "ت و ب", occurrences: 11 },
+  { rang: 171, theme: "Noms d'Allah et qualificatifs", arabe: "الْحَفِيظُ", sens: "Le Gardien, le Protecteur", racine: "ح ف ظ", occurrences: 12 },
+  { rang: 172, theme: "Noms d'Allah et qualificatifs", arabe: "الْحَكِيمُ", sens: "Le Sage ; sage, juste", racine: "ح ك م", occurrences: 97 },
+  { rang: 173, theme: "Noms d'Allah et qualificatifs", arabe: "الْحَلِيمُ", sens: "Le Longanime, le Doux", racine: "ح ل م", occurrences: 15 },
+  { rang: 174, theme: "Noms d'Allah et qualificatifs", arabe: "الْحَمِيدُ", sens: "Le Digne de louange", racine: "ح م د", occurrences: 17 },
+  { rang: 175, theme: "Noms d'Allah et qualificatifs", arabe: "حَمِيم", sens: "Bouillant, brûlant ; ami intime", racine: "ح م م", occurrences: 20 },
+  { rang: 176, theme: "Noms d'Allah et qualificatifs", arabe: "شَدِيد", sens: "Sévère, dur, intense", racine: "ش د د", occurrences: 56 },
+  { rang: 177, theme: "Noms d'Allah et qualificatifs", arabe: "الْعَلِيُّ", sens: "Le Très-Haut ; élevé", racine: "ع ل و", occurrences: 11 },
+  { rang: 178, theme: "Noms d'Allah et qualificatifs", arabe: "الْعَلِيمُ", sens: "L'Omniscient ; savant", racine: "ع ل م", occurrences: 161 },
+  { rang: 179, theme: "Noms d'Allah et qualificatifs", arabe: "قَرِيب", sens: "Près, proche", racine: "ق ر ب", occurrences: 26 },
+  { rang: 180, theme: "Noms d'Allah et qualificatifs", arabe: "كَبِير", sens: "Grand", racine: "ك ب ر", occurrences: 44 },
+  { rang: 181, theme: "Noms d'Allah et qualificatifs", arabe: "كَثِير", sens: "Beaucoup", racine: "ك ث ر", occurrences: 74 },
+  { rang: 182, theme: "Noms d'Allah et qualificatifs", arabe: "سَرِيع", sens: "Rapide", racine: "س ر ع", occurrences: 10 },
+  { rang: 183, theme: "Noms d'Allah et qualificatifs", arabe: "الْعَظِيمُ", sens: "Le Suprême, le Majestueux ; immense", racine: "ع ظ م", occurrences: 107 },
+  { rang: 184, theme: "Noms d'Allah et qualificatifs", arabe: "قَلِيل", sens: "Peu", racine: "ق ل ل", occurrences: 71 },
+  { rang: 185, theme: "Noms d'Allah et qualificatifs", arabe: "الْكَرِيمُ", sens: "Le Généreux ; noble", racine: "ك ر م", occurrences: 27 },
+  { rang: 186, theme: "Noms d'Allah et qualificatifs", arabe: "اللَّطِيفُ", sens: "Le Doux et Bienveillant, le Subtil", racine: "ل ط ف", occurrences: 7 },
+  { rang: 187, theme: "Noms d'Allah et qualificatifs", arabe: "أَشَدّ", sens: "Plus sévère, plus intense", racine: "ش د د", occurrences: 31 },
+  { rang: 188, theme: "Noms d'Allah et qualificatifs", arabe: "أَعْلَى", sens: "Plus haut, supérieur", racine: "ع ل و", occurrences: 9 },
+  { rang: 189, theme: "Noms d'Allah et qualificatifs", arabe: "أَعْلَم", sens: "Plus savant", racine: "ع ل م", occurrences: 49 },
+  { rang: 190, theme: "Noms d'Allah et qualificatifs", arabe: "أَقْرَب", sens: "Plus proche", racine: "ق ر ب", occurrences: 19 },
+  { rang: 191, theme: "Noms d'Allah et qualificatifs", arabe: "أَكْبَر", sens: "Plus grand", racine: "ك ب ر", occurrences: 23 },
+  { rang: 192, theme: "Noms d'Allah et qualificatifs", arabe: "أَكْثَر", sens: "Plus, le plus", racine: "ك ث ر", occurrences: 80 },
+  { rang: 193, theme: "Noms d'Allah et qualificatifs", arabe: "أَحْسَن", sens: "Meilleur", racine: "ح س ن", occurrences: 36 },
+  { rang: 194, theme: "Noms d'Allah et qualificatifs", arabe: "أَحَقّ", sens: "Plus en droit, plus digne", racine: "ح ق ق", occurrences: 10 },
+  { rang: 195, theme: "Noms d'Allah et qualificatifs", arabe: "أَدْنَى", sens: "Plus près, inférieur, moins", racine: "د ن و", occurrences: 12 },
+  { rang: 196, theme: "Noms d'Allah et qualificatifs", arabe: "أَظْلَم", sens: "Plus injuste", racine: "ظ ل م", occurrences: 16 },
+  { rang: 197, theme: "Noms d'Allah et qualificatifs", arabe: "أَهْدَى", sens: "Mieux guidé", racine: "ه د ي", occurrences: 7 },
+  { rang: 198, theme: "Noms d'Allah et qualificatifs", arabe: "أَوْلَى", sens: "Plus proche, plus digne", racine: "و ل ي", occurrences: 11 },
+  { rang: 199, theme: "Création et signes d'Allah", arabe: "بَيِّنَة", sens: "Évidence, preuve claire", racine: "ب ي ن", occurrences: 71 },
+  { rang: 200, theme: "Création et signes d'Allah", arabe: "الْقُرْآنُ", sens: "Le Coran, lecture, récitation", racine: "ق ر ء", occurrences: 70 },
+  { rang: 201, theme: "Création et signes d'Allah", arabe: "نَعَم", sens: "Bétail (pl. أَنْعَام)", racine: "ن ع م", occurrences: 33 },
+  { rang: 202, theme: "Création et signes d'Allah", arabe: "جَبَل", sens: "Montagne (pl. جِبَال)", racine: "ج ب ل", occurrences: 39 },
+  { rang: 203, theme: "Création et signes d'Allah", arabe: "بَحْر", sens: "Mer (pl. بِحَار)", racine: "ب ح ر", occurrences: 41 },
+  { rang: 204, theme: "Création et signes d'Allah", arabe: "الشَّمْس", sens: "Le Soleil", racine: "ش م س", occurrences: 33 },
+  { rang: 205, theme: "Création et signes d'Allah", arabe: "الْقَمَر", sens: "La Lune", racine: "ق م ر", occurrences: 27 },
+  { rang: 206, theme: "Création et signes d'Allah", arabe: "لَيْل", sens: "Nuit (لَيْلَة : une nuit)", racine: "ل ي ل", occurrences: 92 },
+  { rang: 207, theme: "Création et signes d'Allah", arabe: "نَهَار", sens: "Jour (le temps de clarté)", racine: "ن ه ر", occurrences: 57 },
+  { rang: 208, theme: "Création et signes d'Allah", arabe: "آلَاء", sens: "Bienfaits, faveurs", racine: "ء ل ي", occurrences: 34 },
+  { rang: 209, theme: "Création et signes d'Allah", arabe: "سُلْطَان", sens: "Autorité, preuve", racine: "س ل ط", occurrences: 37 },
+  { rang: 210, theme: "Création et signes d'Allah", arabe: "فَضْل", sens: "Grâce, faveur", racine: "ف ض ل", occurrences: 84 },
+  { rang: 211, theme: "Création et signes d'Allah", arabe: "مَاء", sens: "Eau", racine: "م و ه", occurrences: 63 },
+  { rang: 212, theme: "Création et signes d'Allah", arabe: "مُلْك", sens: "Royauté, règne", racine: "م ل ك", occurrences: 48 },
+  { rang: 213, theme: "Création et signes d'Allah", arabe: "نِعْمَة", sens: "Bienfait, faveur", racine: "ن ع م", occurrences: 50 },
+  { rang: 214, theme: "Création et signes d'Allah", arabe: "أَجْمَعُونَ", sens: "Tous ensemble", racine: "ج م ع", occurrences: 26 },
+  { rang: 215, theme: "Création et signes d'Allah", arabe: "إِذْن", sens: "Permission, autorisation", racine: "ء ذ ن", occurrences: 39 },
+  { rang: 216, theme: "Création et signes d'Allah", arabe: "بَأْس", sens: "Puissance, rigueur, châtiment", racine: "ب ء س", occurrences: 25 },
+  { rang: 217, theme: "Création et signes d'Allah", arabe: "جَمِيع", sens: "Tout, tous, entier", racine: "ج م ع", occurrences: 53 },
+  { rang: 218, theme: "Création et signes d'Allah", arabe: "سَوَاء", sens: "Égal, pareil", racine: "س و ي", occurrences: 27 },
+  { rang: 219, theme: "Création et signes d'Allah", arabe: "فَرِيق", sens: "Groupe, partie", racine: "ف ر ق", occurrences: 33 },
+  { rang: 220, theme: "Création et signes d'Allah", arabe: "بَيْت", sens: "Maison (pl. بُيُوت)", racine: "ب ي ت", occurrences: 65 },
+  { rang: 221, theme: "Création et signes d'Allah", arabe: "دَار", sens: "Demeure (pl. دِيَار)", racine: "د و ر", occurrences: 48 },
+  { rang: 222, theme: "Création et signes d'Allah", arabe: "سَبِيل", sens: "Chemin, voie (pl. سُبُل)", racine: "س ب ل", occurrences: 176 },
+  { rang: 223, theme: "Création et signes d'Allah", arabe: "صِرَاط", sens: "Chemin, voie", racine: "ص ر ط", occurrences: 45 },
+  { rang: 224, theme: "Création et signes d'Allah", arabe: "عَالَم", sens: "Monde (pl. عَالَمِين : les mondes)", racine: "ع ل م", occurrences: 73 },
+  { rang: 225, theme: "Création et signes d'Allah", arabe: "فِتْنَة", sens: "Épreuve, tentation", racine: "ف ت ن", occurrences: 34 },
+  { rang: 226, theme: "Création et signes d'Allah", arabe: "قَرْيَة", sens: "Cité, ville (pl. قُرَى)", racine: "ق ر ي", occurrences: 57 },
+  { rang: 227, theme: "Création et signes d'Allah", arabe: "مَال", sens: "Richesse, biens (pl. أَمْوَال)", racine: "م و ل", occurrences: 86 },
+  { rang: 228, theme: "Création et signes d'Allah", arabe: "مَتَاع", sens: "Jouissance, provision", racine: "م ت ع", occurrences: 35 },
+  { rang: 229, theme: "Création et signes d'Allah", arabe: "مَسْجِد", sens: "Mosquée (pl. مَسَاجِد)", racine: "س ج د", occurrences: 28 },
+  { rang: 230, theme: "Création et signes d'Allah", arabe: "مَكَان", sens: "Lieu, endroit", racine: "ك و ن", occurrences: 32 },
+  { rang: 231, theme: "Religion, foi et actes", arabe: "صَاحِب", sens: "Compagnon (pl. أَصْحَاب)", racine: "ص ح ب", occurrences: 94 },
+  { rang: 232, theme: "Religion, foi et actes", arabe: "عَاقِبَة", sens: "Fin, issue, sort", racine: "ع ق ب", occurrences: 32 },
+  { rang: 233, theme: "Religion, foi et actes", arabe: "عِقَاب", sens: "Châtiment, punition", racine: "ع ق ب", occurrences: 20 },
+  { rang: 234, theme: "Religion, foi et actes", arabe: "قِيَامَة", sens: "Résurrection", racine: "ق و م", occurrences: 70 },
+  { rang: 235, theme: "Religion, foi et actes", arabe: "لِقَاء", sens: "Rencontre", racine: "ل ق ي", occurrences: 24 },
+  { rang: 236, theme: "Religion, foi et actes", arabe: "مُسَمًّى", sens: "Fixé, déterminé, nommé", racine: "س م و", occurrences: 21 },
+  { rang: 237, theme: "Religion, foi et actes", arabe: "نَهَر", sens: "Rivière (pl. أَنْهَار)", racine: "ن ه ر", occurrences: 54 },
+  { rang: 238, theme: "Religion, foi et actes", arabe: "وَيْل", sens: "Malheur à…", racine: "و ي ل", occurrences: 40 },
+  { rang: 239, theme: "Religion, foi et actes", arabe: "يَوْمَئِذٍ", sens: "Ce jour-là", racine: "ي و م", occurrences: 70 },
+  { rang: 240, theme: "Religion, foi et actes", arabe: "أَبَدًا", sens: "Toujours, à jamais ; jamais", racine: "ء ب د", occurrences: 28 },
+  { rang: 241, theme: "Religion, foi et actes", arabe: "أَجْر", sens: "Récompense (pl. أُجُور)", racine: "ء ج ر", occurrences: 105 },
+  { rang: 242, theme: "Religion, foi et actes", arabe: "أَجَل", sens: "Terme, délai", racine: "ء ج ل", occurrences: 52 },
+  { rang: 243, theme: "Religion, foi et actes", arabe: "أَلِيم", sens: "Douloureux", racine: "ء ل م", occurrences: 72 },
+  { rang: 244, theme: "Religion, foi et actes", arabe: "ثَوَاب", sens: "Récompense", racine: "ث و ب", occurrences: 13 },
+  { rang: 245, theme: "Religion, foi et actes", arabe: "جَحِيم", sens: "Fournaise, Enfer", racine: "ج ح م", occurrences: 26 },
+  { rang: 246, theme: "Religion, foi et actes", arabe: "جَزَاء", sens: "Rétribution", racine: "ج ز ي", occurrences: 42 },
+  { rang: 247, theme: "Religion, foi et actes", arabe: "جَهَنَّم", sens: "L'Enfer", occurrences: 77 },
+  { rang: 248, theme: "Religion, foi et actes", arabe: "حِسَاب", sens: "Compte, jugement", racine: "ح س ب", occurrences: 39 },
+  { rang: 249, theme: "Religion, foi et actes", arabe: "السَّاعَة", sens: "L'Heure (fin du monde), heure", racine: "س و ع", occurrences: 48 },
+  { rang: 250, theme: "Religion, foi et actes", arabe: "أَمْر", sens: "Affaire, ordre, commandement (pl. أُمُور)", racine: "ء م ر", occurrences: 166 },
+  { rang: 251, theme: "Religion, foi et actes", arabe: "تَقْوَى", sens: "Piété, crainte d'Allah", racine: "و ق ي", occurrences: 17 },
+  { rang: 252, theme: "Religion, foi et actes", arabe: "حَقّ", sens: "Vérité, droit", racine: "ح ق ق", occurrences: 247 },
+  { rang: 253, theme: "Religion, foi et actes", arabe: "بَاطِل", sens: "Faux, mensonge", racine: "ب ط ل", occurrences: 26 },
+  { rang: 254, theme: "Religion, foi et actes", arabe: "حِكْمَة", sens: "Sagesse", racine: "ح ك م", occurrences: 20 },
+  { rang: 255, theme: "Religion, foi et actes", arabe: "حَمْد", sens: "Louange", racine: "ح م د", occurrences: 43 },
+  { rang: 256, theme: "Religion, foi et actes", arabe: "دِين", sens: "Religion ; rétribution", racine: "د ي ن", occurrences: 92 },
+  { rang: 257, theme: "Religion, foi et actes", arabe: "زَكَاة", sens: "Aumône purificatrice", racine: "ز ك و", occurrences: 32 },
+  { rang: 258, theme: "Religion, foi et actes", arabe: "شَهِيد", sens: "Témoin (pl. شُهَدَاء)", racine: "ش ه د", occurrences: 56 },
+  { rang: 259, theme: "Religion, foi et actes", arabe: "مُبِين", sens: "Clair, évident", racine: "ب ي ن", occurrences: 119 },
+  { rang: 260, theme: "Religion, foi et actes", arabe: "نُور", sens: "Lumière", racine: "ن و ر", occurrences: 43 },
+  { rang: 261, theme: "Religion, foi et actes", arabe: "أَحَد", sens: "Un, quelqu'un (fém. إِحْدَى)", racine: "ء ح د" },
+  { rang: 262, theme: "Religion, foi et actes", arabe: "إِلَٰه", sens: "Divinité (pl. آلِهَة)", racine: "ء ل ه" },
+  { rang: 263, theme: "Religion, foi et actes", arabe: "شَرِيك", sens: "Associé (pl. شُرَكَاء)", racine: "ش ر ك" },
+  { rang: 264, theme: "Religion, foi et actes", arabe: "شَهَادَة", sens: "Témoignage", racine: "ش ه د" },
+  { rang: 265, theme: "Religion, foi et actes", arabe: "عَرْش", sens: "Trône", racine: "ع ر ش" },
+  { rang: 266, theme: "Religion, foi et actes", arabe: "عَهْد", sens: "Engagement, pacte", racine: "ع ه د" },
+  { rang: 267, theme: "Religion, foi et actes", arabe: "الْغَيْب", sens: "L'invisible, le mystère", racine: "غ ي ب" },
+  { rang: 268, theme: "Religion, foi et actes", arabe: "كَلِمَة", sens: "Mot, parole (pl. كَلِمَات)", racine: "ك ل م" },
+  { rang: 269, theme: "Religion, foi et actes", arabe: "مِيثَاق", sens: "Engagement solennel, pacte", racine: "و ث ق" },
+  { rang: 270, theme: "Religion, foi et actes", arabe: "وَاحِد", sens: "Un, unique (fém. وَاحِدَة)", racine: "و ح د" },
+  { rang: 271, theme: "Religion, foi et actes", arabe: "أَعْمَال", sens: "Actions, œuvres", racine: "ع م ل" },
+  { rang: 272, theme: "Religion, foi et actes", arabe: "حَسَنَة", sens: "Bonne action (pl. حَسَنَات)", racine: "ح س ن" },
+  { rang: 273, theme: "Religion, foi et actes", arabe: "سَيِّئَة", sens: "Mauvaise action (pl. سَيِّئَات)", racine: "س و ء" },
+  { rang: 274, theme: "Religion, foi et actes", arabe: "خَيْر", sens: "Bien ; meilleur", racine: "خ ي ر" },
+  { rang: 275, theme: "Religion, foi et actes", arabe: "شَرّ", sens: "Mal ; pire", racine: "ش ر ر" },
+  { rang: 276, theme: "Religion, foi et actes", arabe: "إِثْم", sens: "Péché, crime", racine: "ء ث م" },
+  { rang: 277, theme: "Religion, foi et actes", arabe: "ذَنْب", sens: "Péché, faute (pl. ذُنُوب)", racine: "ذ ن ب" },
+  { rang: 278, theme: "Religion, foi et actes", arabe: "جُنَاح", sens: "Faute, reproche", racine: "ج ن ح" },
+  { rang: 279, theme: "Religion, foi et actes", arabe: "حَرَام", sens: "Interdit ; sacré", racine: "ح ر م" },
+  { rang: 280, theme: "Religion, foi et actes", arabe: "اسْم", sens: "Nom (pl. أَسْمَاء)", racine: "س م و" },
+  { rang: 281, theme: "Religion, foi et actes", arabe: "حَدِيث", sens: "Discours, récit (pl. أَحَادِيث)", racine: "ح د ث" },
+  { rang: 282, theme: "Religion, foi et actes", arabe: "طَيِّبَة", sens: "Bonne chose, pure (pl. طَيِّبَات)", racine: "ط ي ب" },
+  { rang: 283, theme: "Personnes", arabe: "نَبِيّ", sens: "Prophète (pl. أَنْبِيَاء, نَبِيُّون)", racine: "ن ب ء", occurrences: 75 },
+  { rang: 284, theme: "Personnes", arabe: "مُرْسَل", sens: "Envoyé (pl. مُرْسَلُون)", racine: "ر س ل", occurrences: 35 },
+  { rang: 285, theme: "Personnes", arabe: "آدَم", sens: "Adam", occurrences: 25 },
+  { rang: 286, theme: "Personnes", arabe: "نُوح", sens: "Noé", occurrences: 43 },
+  { rang: 287, theme: "Personnes", arabe: "إِبْرَاهِيم", sens: "Abraham", occurrences: 69 },
+  { rang: 288, theme: "Personnes", arabe: "لُوط", sens: "Loth", occurrences: 27 },
+  { rang: 289, theme: "Personnes", arabe: "إِسْمَاعِيل", sens: "Ismaël", occurrences: 12 },
+  { rang: 290, theme: "Personnes", arabe: "إِسْحَاق", sens: "Isaac", occurrences: 17 },
+  { rang: 291, theme: "Personnes", arabe: "يَعْقُوب", sens: "Jacob", occurrences: 16 },
+  { rang: 292, theme: "Personnes", arabe: "إِسْرَائِيل", sens: "Israël (Jacob)", occurrences: 43 },
+  { rang: 293, theme: "Personnes", arabe: "يُوسُف", sens: "Joseph", occurrences: 27 },
+  { rang: 294, theme: "Personnes", arabe: "هُود", sens: "Houd (prophète des 'Âd)", occurrences: 7 },
+  { rang: 295, theme: "Personnes", arabe: "شُعَيْب", sens: "Chou'ayb (prophète de Madyan)", occurrences: 11 },
+  { rang: 296, theme: "Personnes", arabe: "صَالِح", sens: "Sâlih (prophète des Thamoud)", racine: "ص ل ح", occurrences: 9 },
+  { rang: 297, theme: "Personnes", arabe: "مُوسَى", sens: "Moïse", occurrences: 136 },
+  { rang: 298, theme: "Personnes", arabe: "عِيسَى", sens: "Jésus", occurrences: 25 },
+  { rang: 299, theme: "Personnes", arabe: "مَرْيَم", sens: "Marie", occurrences: 34 },
+  { rang: 300, theme: "Personnes", arabe: "شَيْطَان", sens: "Satan, démon (pl. شَيَاطِين)", racine: "ش ط ن", occurrences: 88 },
+  { rang: 301, theme: "Personnes", arabe: "فِرْعَوْن", sens: "Pharaon", occurrences: 74 },
+  { rang: 302, theme: "Personnes", arabe: "عَاد", sens: "'Âd (peuple)", occurrences: 24 },
+  { rang: 303, theme: "Personnes", arabe: "ثَمُود", sens: "Thamoud (peuple)", occurrences: 26 },
+  { rang: 304, theme: "Personnes", arabe: "أُمّ", sens: "Mère (pl. أُمَّهَات)", racine: "ء م م", occurrences: 35 },
+  { rang: 305, theme: "Personnes", arabe: "أَب", sens: "Père (pl. آبَاء ; أَبَوَان : les deux parents)", racine: "ء ب و", occurrences: 110 },
+  { rang: 306, theme: "Personnes", arabe: "زَوْج", sens: "Époux, épouse (pl. أَزْوَاج)", racine: "ز و ج", occurrences: 76 },
+  { rang: 307, theme: "Personnes", arabe: "رَجُل", sens: "Homme (pl. رِجَال)", racine: "ر ج ل", occurrences: 57 },
+  { rang: 308, theme: "Personnes", arabe: "امْرَأَة", sens: "Femme (pl. نِسَاء)", racine: "م ر ء", occurrences: 85 },
+  { rang: 309, theme: "Personnes", arabe: "وَلَد", sens: "Enfant (pl. أَوْلَاد)", racine: "و ل د", occurrences: 56 },
+  { rang: 310, theme: "Personnes", arabe: "وَالِد", sens: "Géniteur, père (وَالِدَيْن : les deux parents)", racine: "و ل د", occurrences: 27 },
+  { rang: 311, theme: "Personnes", arabe: "ذُرِّيَّة", sens: "Descendance, progéniture", racine: "ذ ر ر", occurrences: 32 },
+  { rang: 312, theme: "Personnes", arabe: "ابْن", sens: "Fils (pl. بَنُون, أَبْنَاء)", racine: "ب ن ي", occurrences: 63 },
+  { rang: 313, theme: "Personnes", arabe: "بِنْت", sens: "Fille (pl. بَنَات)", racine: "ب ن ي", occurrences: 19 },
+  { rang: 314, theme: "Personnes", arabe: "أَخ", sens: "Frère (pl. إِخْوَان)", racine: "ء خ و", occurrences: 75 },
+  { rang: 315, theme: "Personnes", arabe: "أُخْت", sens: "Sœur", racine: "ء خ و", occurrences: 14 },
+  { rang: 316, theme: "Personnes", arabe: "وَجْه", sens: "Visage, face (pl. وُجُوه)", racine: "و ج ه", occurrences: 72 },
+  { rang: 317, theme: "Personnes", arabe: "عَيْن", sens: "Œil ; source (pl. أَعْيُن)", racine: "ع ي ن", occurrences: 47 },
+  { rang: 318, theme: "Personnes", arabe: "أَبْصَار", sens: "Regards, vues", racine: "ب ص ر", occurrences: 38 },
+  { rang: 319, theme: "Personnes", arabe: "أَفْوَاه", sens: "Bouches", racine: "ف و ه", occurrences: 21 },
+  { rang: 320, theme: "Personnes", arabe: "لِسَان", sens: "Langue, langage (pl. أَلْسِنَة)", racine: "ل س ن", occurrences: 25 },
+  { rang: 321, theme: "Personnes", arabe: "صَدْر", sens: "Poitrine, cœur (pl. صُدُور)", racine: "ص د ر", occurrences: 44 },
+  { rang: 322, theme: "Personnes", arabe: "يَد", sens: "Main (pl. أَيْدِي)", racine: "ي د ي", occurrences: 118 },
+  { rang: 323, theme: "Personnes", arabe: "رِجْل", sens: "Pied (pl. أَرْجُل)", racine: "ر ج ل", occurrences: 15 },
+  { rang: 324, theme: "Personnes", arabe: "رُوح", sens: "Esprit, âme", racine: "ر و ح", occurrences: 21 },
+  { rang: 325, theme: "Personnes", arabe: "قُوَّة", sens: "Force, puissance", racine: "ق و ي", occurrences: 28 },
+  { rang: 326, theme: "Personnes", arabe: "أُمَّة", sens: "Communauté (pl. أُمَم)", racine: "ء م م", occurrences: 64 },
+  { rang: 327, theme: "Personnes", arabe: "إِنْسَان", sens: "Être humain", racine: "ء ن س", occurrences: 65 },
+  { rang: 328, theme: "Personnes", arabe: "ذَكَر", sens: "Mâle", racine: "ذ ك ر", occurrences: 18 },
+  { rang: 329, theme: "Personnes", arabe: "أُنْثَى", sens: "Femelle", racine: "ء ن ث", occurrences: 30 },
+  { rang: 330, theme: "Personnes", arabe: "عَبْد", sens: "Serviteur, adorateur (pl. عِبَاد)", racine: "ع ب د", occurrences: 131 },
+  { rang: 331, theme: "Personnes", arabe: "عَدُوّ", sens: "Ennemi (pl. أَعْدَاء)", racine: "ع د و", occurrences: 50 },
+  { rang: 332, theme: "Personnes", arabe: "كَافِر", sens: "Mécréant (pl. كُفَّار, كَافِرُون)", racine: "ك ف ر", occurrences: 156 },
+  { rang: 333, theme: "Personnes", arabe: "مُجْرِم", sens: "Criminel", racine: "ج ر م", occurrences: 52 },
+  { rang: 334, theme: "Personnes", arabe: "مَلَأ", sens: "Notables, chefs", racine: "م ل ء", occurrences: 30 },
+  { rang: 335, theme: "Personnes", arabe: "وَلِيّ", sens: "Allié, protecteur (pl. أَوْلِيَاء)", racine: "و ل ي", occurrences: 86 },
+  { rang: 336, theme: "Verbes", arabe: "فَعَلَ", sens: "Faire", racine: "ف ع ل", occurrences: 105, formes: "يَفْعَلُ · فِعْل" },
+  { rang: 337, theme: "Verbes", arabe: "فَتَحَ", sens: "Ouvrir ; donner la victoire", racine: "ف ت ح", occurrences: 29, formes: "يَفْتَحُ · فَتْح" },
+  { rang: 338, theme: "Verbes", arabe: "بَعَثَ", sens: "Envoyer ; ressusciter", racine: "ب ع ث", occurrences: 65, formes: "يَبْعَثُ · بَعْث" },
+  { rang: 339, theme: "Verbes", arabe: "جَمَعَ", sens: "Rassembler", racine: "ج م ع", occurrences: 40, formes: "يَجْمَعُ · جَمْع" },
+  { rang: 340, theme: "Verbes", arabe: "ذَهَبَ", sens: "Aller, partir", racine: "ذ ه ب", occurrences: 35, formes: "يَذْهَبُ · ذَهَاب" },
+  { rang: 341, theme: "Verbes", arabe: "رَفَعَ", sens: "Élever", racine: "ر ف ع", occurrences: 28, formes: "يَرْفَعُ · رَفْع" },
+  { rang: 342, theme: "Verbes", arabe: "سَحَرَ", sens: "Ensorceler", racine: "س ح ر", occurrences: 49, formes: "يَسْحَرُ · سِحْر" },
+  { rang: 343, theme: "Verbes", arabe: "صَلَحَ", sens: "Être bon, se réformer", racine: "ص ل ح", occurrences: 131, formes: "يَصْلُحُ · صَالِح" },
+  { rang: 344, theme: "Verbes", arabe: "لَعَنَ", sens: "Maudire", racine: "ل ع ن", occurrences: 27, formes: "يَلْعَنُ · لَعْن" },
+  { rang: 345, theme: "Verbes", arabe: "نَفَعَ", sens: "Profiter, être utile", racine: "ن ف ع", occurrences: 42, formes: "يَنْفَعُ · نَفْع" },
+  { rang: 346, theme: "Verbes", arabe: "نَصَرَ", sens: "Secourir, aider", racine: "ن ص ر", occurrences: 92, formes: "يَنْصُرُ · نَصْر" },
+  { rang: 347, theme: "Verbes", arabe: "بَلَغَ", sens: "Atteindre", racine: "ب ل غ", occurrences: 49, formes: "يَبْلُغُ · بُلُوغ" },
+  { rang: 348, theme: "Verbes", arabe: "تَرَكَ", sens: "Laisser, abandonner", racine: "ت ر ك", occurrences: 43, formes: "يَتْرُكُ · تَرْك" },
+  { rang: 349, theme: "Verbes", arabe: "حَشَرَ", sens: "Rassembler", racine: "ح ش ر", occurrences: 43, formes: "يَحْشُرُ · حَشْر" },
+  { rang: 350, theme: "Verbes", arabe: "حَكَمَ", sens: "Juger, décider", racine: "ح ك م", occurrences: 80, formes: "يَحْكُمُ · حُكْم" },
+  { rang: 351, theme: "Verbes", arabe: "خَرَجَ", sens: "Sortir", racine: "خ ر ج", occurrences: 61, formes: "يَخْرُجُ · خُرُوج" },
+  { rang: 352, theme: "Verbes", arabe: "خَلَدَ", sens: "Demeurer éternellement", racine: "خ ل د", occurrences: 83, formes: "يَخْلُدُ · خُلُود" },
+  { rang: 353, theme: "Verbes", arabe: "دَخَلَ", sens: "Entrer", racine: "د خ ل", occurrences: 78, formes: "يَدْخُلُ · دُخُول" },
+  { rang: 354, theme: "Verbes", arabe: "ذَكَرَ", sens: "Se souvenir, mentionner", racine: "ذ ك ر", occurrences: 163, formes: "يَذْكُرُ · ذِكْر" },
+  { rang: 355, theme: "Verbes", arabe: "رَزَقَ", sens: "Pourvoir, accorder la subsistance", racine: "ر ز ق", occurrences: 122, formes: "يَرْزُقُ · رِزْق" },
+  { rang: 356, theme: "Verbes", arabe: "سَجَدَ", sens: "Se prosterner", racine: "س ج د", occurrences: 49, formes: "يَسْجُدُ · سُجُود" },
+  { rang: 357, theme: "Verbes", arabe: "شَعَرَ", sens: "Ressentir, se rendre compte", racine: "ش ع ر", occurrences: 29, formes: "يَشْعُرُ · شُعُور" },
+  { rang: 358, theme: "Verbes", arabe: "شَكَرَ", sens: "Remercier, être reconnaissant", racine: "ش ك ر", occurrences: 63, formes: "يَشْكُرُ · شُكْر" },
+  { rang: 359, theme: "Verbes", arabe: "صَدَقَ", sens: "Dire la vérité", racine: "ص د ق", occurrences: 89, formes: "يَصْدُقُ · صِدْق" },
+  { rang: 360, theme: "Verbes", arabe: "فَسَقَ", sens: "Transgresser", racine: "ف س ق", occurrences: 54, formes: "يَفْسُقُ · فِسْق" },
+  { rang: 361, theme: "Verbes", arabe: "قَتَلَ", sens: "Tuer, combattre", racine: "ق ت ل", occurrences: 93, formes: "يَقْتُلُ · قَتْل" },
+  { rang: 362, theme: "Verbes", arabe: "قَعَدَ", sens: "S'asseoir", racine: "ق ع د", occurrences: 23, formes: "يَقْعُدُ · قُعُود" },
+  { rang: 363, theme: "Verbes", arabe: "كَتَبَ", sens: "Écrire, prescrire", racine: "ك ت ب", occurrences: 56, formes: "يَكْتُبُ · كِتَابَة" },
+  { rang: 364, theme: "Verbes", arabe: "مَكَرَ", sens: "Comploter, ruser", racine: "م ك ر", occurrences: 43, formes: "يَمْكُرُ · مَكْر" },
+  { rang: 365, theme: "Verbes", arabe: "نَظَرَ", sens: "Regarder, attendre", racine: "ن ظ ر", occurrences: 95, formes: "يَنْظُرُ · نَظَر" },
+  { rang: 366, theme: "Verbes", arabe: "ضَرَبَ", sens: "Frapper ; citer (un exemple)", racine: "ض ر ب", occurrences: 50, formes: "يَضْرِبُ · ضَرْب" },
+  { rang: 367, theme: "Verbes", arabe: "حَمَلَ", sens: "Porter", racine: "ح م ل", occurrences: 94, formes: "يَحْمِلُ · حَمْل" },
+  { rang: 368, theme: "Verbes", arabe: "صَبَرَ", sens: "Patienter, endurer", racine: "ص ب ر", occurrences: 266, formes: "يَصْبِرُ · صَبْر" },
+  { rang: 369, theme: "Verbes", arabe: "ظَلَمَ", sens: "Être injuste", racine: "ظ ل م", occurrences: 59, formes: "يَظْلِمُ · ظُلْم" },
+  { rang: 370, theme: "Verbes", arabe: "عَرَفَ", sens: "Connaître, reconnaître", racine: "ع ر ف", occurrences: 49, formes: "يَعْرِفُ · مَعْرِفَة" },
+  { rang: 371, theme: "Verbes", arabe: "عَقَلَ", sens: "Comprendre, raisonner", racine: "ع ق ل", occurrences: 95, formes: "يَعْقِلُ · عَقْل" },
+  { rang: 372, theme: "Verbes", arabe: "غَفَرَ", sens: "Pardonner", racine: "غ ف ر", occurrences: 47, formes: "يَغْفِرُ · مَغْفِرَة" },
+  { rang: 373, theme: "Verbes", arabe: "قَدَرَ", sens: "Décréter ; être capable", racine: "ق د ر", occurrences: 76, formes: "يَقْدِرُ · قَدْر" },
+  { rang: 374, theme: "Verbes", arabe: "كَذَبَ", sens: "Mentir", racine: "ك ذ ب", occurrences: 62, formes: "يَكْذِبُ · كَذِب" },
+  { rang: 375, theme: "Verbes", arabe: "كَسَبَ", sens: "Acquérir, gagner", racine: "ك س ب", occurrences: 49, formes: "يَكْسِبُ · كَسْب" },
+  { rang: 376, theme: "Verbes", arabe: "مَلَكَ", sens: "Posséder", racine: "م ل ك", formes: "يَمْلِكُ · مُلْك" },
+  { rang: 377, theme: "Verbes", arabe: "سَمِعَ", sens: "Entendre, écouter", racine: "س م ع", occurrences: 100, formes: "يَسْمَعُ · سَمْع" },
+  { rang: 378, theme: "Verbes", arabe: "حَزِنَ", sens: "Être triste", racine: "ح ز ن", occurrences: 30, formes: "يَحْزَنُ · حُزْن" },
+  { rang: 379, theme: "Verbes", arabe: "حَسِبَ", sens: "Penser, croire", racine: "ح س ب", occurrences: 46, formes: "يَحْسَبُ" },
+  { rang: 380, theme: "Verbes", arabe: "حَفِظَ", sens: "Préserver, protéger", racine: "ح ف ظ", occurrences: 27, formes: "يَحْفَظُ · حِفْظ" },
+  { rang: 381, theme: "Verbes", arabe: "خَسِرَ", sens: "Perdre", racine: "خ س ر", occurrences: 51, formes: "يَخْسَرُ · خُسْر" },
+  { rang: 382, theme: "Verbes", arabe: "رَحِمَ", sens: "Faire miséricorde", racine: "ر ح م", occurrences: 148, formes: "يَرْحَمُ · رَحْمَة" },
+  { rang: 383, theme: "Verbes", arabe: "شَهِدَ", sens: "Être témoin, attester", racine: "ش ه د", occurrences: 66, formes: "يَشْهَدُ · شَهَادَة" },
+  { rang: 384, theme: "Verbes", arabe: "عَمِلَ", sens: "Œuvrer, faire", racine: "ع م ل", occurrences: 318, formes: "يَعْمَلُ · عَمَل" },
+  { rang: 385, theme: "Verbes", arabe: "كَرِهَ", sens: "Détester", racine: "ك ر ه", occurrences: 25, formes: "يَكْرَهُ · كُرْه" },
+  { rang: 386, theme: "Verbes", arabe: "بَصُرَ", sens: "Voir, comprendre", racine: "ب ص ر", occurrences: 13, formes: "يَبْصُرُ" },
+  { rang: 387, theme: "Verbes", arabe: "حَيِيَ", sens: "Vivre", racine: "ح ي ي", occurrences: 83, formes: "يَحْيَا · حَيَاة" },
+  { rang: 388, theme: "Verbes", arabe: "رَدَّ", sens: "Ramener, rendre", racine: "ر د د", occurrences: 45, formes: "يَرُدُّ · رَدّ" },
+  { rang: 389, theme: "Verbes", arabe: "صَدَّ", sens: "Détourner, repousser", racine: "ص د د", occurrences: 39, formes: "يَصُدُّ · صَدّ" },
+  { rang: 390, theme: "Verbes", arabe: "ضَرَّ", sens: "Nuire", racine: "ض ر ر", occurrences: 31, formes: "يَضُرُّ · ضَرّ" },
+  { rang: 391, theme: "Verbes", arabe: "ضَلَّ", sens: "S'égarer", racine: "ض ل ل", occurrences: 113, formes: "يَضِلُّ · ضَلَال" },
+  { rang: 392, theme: "Verbes", arabe: "ظَنَّ", sens: "Penser, supposer", racine: "ظ ن ن", occurrences: 68, formes: "يَظُنُّ · ظَنّ" },
+  { rang: 393, theme: "Verbes", arabe: "عَدَّ", sens: "Compter", racine: "ع د د", occurrences: 17, formes: "يَعُدُّ · عَدّ" },
+  { rang: 394, theme: "Verbes", arabe: "غَرَّ", sens: "Tromper, leurrer", racine: "غ ر ر", occurrences: 24, formes: "يَغُرُّ · غُرُور" },
+  { rang: 395, theme: "Verbes", arabe: "مَدَّ", sens: "Étendre, prolonger", racine: "م د د", occurrences: 17, formes: "يَمُدُّ · مَدّ" },
+  { rang: 396, theme: "Verbes", arabe: "مَسَّ", sens: "Toucher, atteindre", racine: "م س س", occurrences: 58, formes: "يَمَسُّ · مَسّ" },
+  { rang: 397, theme: "Verbes", arabe: "وَدَّ", sens: "Aimer, souhaiter", racine: "و د د", occurrences: 18, formes: "يَوَدُّ · وُدّ" },
+  { rang: 398, theme: "Verbes", arabe: "وَذَرَ", sens: "Laisser, délaisser", racine: "و ذ ر", occurrences: 45, formes: "يَذَرُ" },
+  { rang: 399, theme: "Verbes", arabe: "وَضَعَ", sens: "Poser, mettre", racine: "و ض ع", occurrences: 22, formes: "يَضَعُ · وَضْع" },
+  { rang: 400, theme: "Verbes", arabe: "وَقَعَ", sens: "Arriver, survenir", racine: "و ق ع", occurrences: 20, formes: "يَقَعُ · وُقُوع" },
+  { rang: 401, theme: "Verbes", arabe: "وَهَبَ", sens: "Offrir, faire don", racine: "و ه ب", occurrences: 23, formes: "يَهَبُ · وَهْب" },
+  { rang: 402, theme: "Verbes", arabe: "وَجَدَ", sens: "Trouver", racine: "و ج د", occurrences: 107, formes: "يَجِدُ · وُجُود" },
+  { rang: 403, theme: "Verbes", arabe: "وَرِثَ", sens: "Hériter", racine: "و ر ث", occurrences: 19, formes: "يَرِثُ · وِرَاثَة" },
+  { rang: 404, theme: "Verbes", arabe: "وَزَرَ", sens: "Porter un fardeau", racine: "و ز ر", occurrences: 19, formes: "يَزِرُ · وِزْر" },
+  { rang: 405, theme: "Verbes", arabe: "وَصَفَ", sens: "Décrire", racine: "و ص ف", occurrences: 14, formes: "يَصِفُ · وَصْف" },
+  { rang: 406, theme: "Verbes", arabe: "وَعَدَ", sens: "Promettre", racine: "و ع د", occurrences: 124, formes: "يَعِدُ · وَعْد" },
+  { rang: 407, theme: "Verbes", arabe: "وَقَى", sens: "Protéger, préserver", racine: "و ق ي", occurrences: 19, formes: "يَقِي · وِقَايَة" },
+  { rang: 408, theme: "Verbes", arabe: "وَسِعَ", sens: "Englober, être vaste", racine: "و س ع", occurrences: 25, formes: "يَسَعُ · سَعَة" },
+  { rang: 409, theme: "Verbes", arabe: "تَابَ", sens: "Se repentir, revenir", racine: "ت و ب", occurrences: 72, formes: "يَتُوبُ · تَوْبَة" },
+  { rang: 410, theme: "Verbes", arabe: "ذَاقَ", sens: "Goûter", racine: "ذ و ق", occurrences: 42, formes: "يَذُوقُ · ذَوْق" },
+  { rang: 411, theme: "Verbes", arabe: "فَازَ", sens: "Réussir, triompher", racine: "ف و ز", occurrences: 26, formes: "يَفُوزُ · فَوْز" },
+  { rang: 412, theme: "Verbes", arabe: "قَامَ", sens: "Se lever, se dresser", racine: "ق و م", occurrences: 55, formes: "يَقُومُ · قِيَام" },
+  { rang: 413, theme: "Verbes", arabe: "مَاتَ", sens: "Mourir", racine: "م و ت", occurrences: 93, formes: "يَمُوتُ · مَوْت" },
+  { rang: 414, theme: "Verbes", arabe: "خَافَ", sens: "Avoir peur, craindre", racine: "خ و ف", occurrences: 112, formes: "يَخَافُ · خَوْف" },
+  { rang: 415, theme: "Verbes", arabe: "كَادَ", sens: "Être sur le point de", racine: "ك و د", occurrences: 24, formes: "يَكَادُ" },
+  { rang: 416, theme: "Verbes", arabe: "زَادَ", sens: "Augmenter", racine: "ز ي د", occurrences: 51, formes: "يَزِيدُ · زِيَادَة" },
+  { rang: 417, theme: "Verbes", arabe: "تَلَا", sens: "Réciter", racine: "ت ل و", occurrences: 61, formes: "يَتْلُو · تِلَاوَة" },
+  { rang: 418, theme: "Verbes", arabe: "دَعَا", sens: "Appeler, invoquer", racine: "د ع و", occurrences: 197, formes: "يَدْعُو · دُعَاء" },
+  { rang: 419, theme: "Verbes", arabe: "عَفَا", sens: "Pardonner, effacer", racine: "ع ف و", occurrences: 30, formes: "يَعْفُو · عَفْو" },
+  { rang: 420, theme: "Verbes", arabe: "بَغَى", sens: "Vouloir ; transgresser", racine: "ب غ ي", occurrences: 29, formes: "يَبْغِي" },
+  { rang: 421, theme: "Verbes", arabe: "جَرَى", sens: "Couler", racine: "ج ر ي", occurrences: 60, formes: "يَجْرِي" },
+  { rang: 422, theme: "Verbes", arabe: "جَزَى", sens: "Récompenser, rétribuer", racine: "ج ز ي", occurrences: 116, formes: "يَجْزِي · جَزَاء" },
+  { rang: 423, theme: "Verbes", arabe: "قَضَى", sens: "Décréter, accomplir", racine: "ق ض ي", occurrences: 62, formes: "يَقْضِي" },
+  { rang: 424, theme: "Verbes", arabe: "كَفَى", sens: "Suffire", racine: "ك ف ي", occurrences: 32, formes: "يَكْفِي" },
+  { rang: 425, theme: "Verbes", arabe: "هَدَى", sens: "Guider", racine: "ه د ي", occurrences: 163, formes: "يَهْدِي · هُدًى" },
+  { rang: 426, theme: "Verbes", arabe: "خَشِيَ", sens: "Craindre", racine: "خ ش ي", occurrences: 48, formes: "يَخْشَى · خَشْيَة" },
+  { rang: 427, theme: "Verbes", arabe: "رَضِيَ", sens: "Être satisfait, agréer", racine: "ر ض و", occurrences: 57, formes: "يَرْضَى · رِضْوَان" },
+  { rang: 428, theme: "Verbes", arabe: "نَسِيَ", sens: "Oublier", racine: "ن س ي", occurrences: 36, formes: "يَنْسَى" },
+  { rang: 429, theme: "Verbes", arabe: "سَأَلَ", sens: "Demander, questionner", racine: "س ء ل", formes: "يَسْأَلُ · سُؤَال" },
+  { rang: 430, theme: "Verbes", arabe: "قَرَأَ", sens: "Lire, réciter", racine: "ق ر ء", formes: "يَقْرَأُ · قِرَاءَة" },
+  { rang: 431, theme: "Verbes", arabe: "أَخَذَ", sens: "Prendre, saisir", racine: "ء خ ذ", formes: "يَأْخُذُ · أَخْذ" },
+  { rang: 432, theme: "Verbes", arabe: "أَكَلَ", sens: "Manger", racine: "ء ك ل", formes: "يَأْكُلُ · أَكْل" },
+  { rang: 433, theme: "Verbes", arabe: "أَمَرَ", sens: "Ordonner", racine: "ء م ر", formes: "يَأْمُرُ · أَمْر" },
+  { rang: 434, theme: "Verbes", arabe: "أَمِنَ", sens: "Être en sécurité", racine: "ء م ن", formes: "يَأْمَنُ · أَمْن" },
+  { rang: 435, theme: "Verbes", arabe: "أَبَى", sens: "Refuser", racine: "ء ب ي", formes: "يَأْبَى" },
+  { rang: 436, theme: "Verbes", arabe: "رَأَى", sens: "Voir", racine: "ر ء ي", formes: "يَرَى · رَأْي" },
+  { rang: 437, theme: "Verbes", arabe: "أَتَى", sens: "Venir, arriver", racine: "ء ت ي", formes: "يَأْتِي · إِتْيَان" },
+  { rang: 438, theme: "Verbes", arabe: "شَاءَ", sens: "Vouloir", racine: "ش ي ء", formes: "يَشَاءُ · مَشِيئَة" },
+  { rang: 439, theme: "Verbes", arabe: "سَاءَ", sens: "Être mauvais", racine: "س و ء", formes: "يَسُوءُ · سُوء" },
+  { rang: 440, theme: "Verbes", arabe: "بَدَّلَ", sens: "Changer, échanger", racine: "ب د ل", occurrences: 33, formes: "يُبَدِّلُ · تَبْدِيل" },
+  { rang: 441, theme: "Verbes", arabe: "بَشَّرَ", sens: "Annoncer une bonne nouvelle", racine: "ب ش ر", occurrences: 48, formes: "يُبَشِّرُ · تَبْشِير" },
+  { rang: 442, theme: "Verbes", arabe: "بَيَّنَ", sens: "Clarifier, expliquer", racine: "ب ي ن", occurrences: 35, formes: "يُبَيِّنُ · تَبْيِين" },
+  { rang: 443, theme: "Verbes", arabe: "زَيَّنَ", sens: "Embellir", racine: "ز ي ن", occurrences: 26, formes: "يُزَيِّنُ · تَزْيِين" },
+  { rang: 444, theme: "Verbes", arabe: "سَبَّحَ", sens: "Glorifier", racine: "س ب ح", occurrences: 48, formes: "يُسَبِّحُ · تَسْبِيح" },
+  { rang: 445, theme: "Verbes", arabe: "سَخَّرَ", sens: "Soumettre, assujettir", racine: "س خ ر", occurrences: 26, formes: "يُسَخِّرُ · تَسْخِير" },
+  { rang: 446, theme: "Verbes", arabe: "صَدَّقَ", sens: "Confirmer, croire vrai", racine: "ص د ق", occurrences: 31, formes: "يُصَدِّقُ · تَصْدِيق" },
+  { rang: 447, theme: "Verbes", arabe: "عَذَّبَ", sens: "Châtier", racine: "ع ذ ب", occurrences: 49, formes: "يُعَذِّبُ · تَعْذِيب" },
+  { rang: 448, theme: "Verbes", arabe: "عَلَّمَ", sens: "Enseigner", racine: "ع ل م", occurrences: 42, formes: "يُعَلِّمُ · تَعْلِيم" },
+  { rang: 449, theme: "Verbes", arabe: "قَدَّمَ", sens: "Faire passer devant", racine: "ق د م", occurrences: 27, formes: "يُقَدِّمُ · تَقْدِيم" },
+  { rang: 450, theme: "Verbes", arabe: "كَذَّبَ", sens: "Traiter de menteur, démentir", racine: "ك ذ ب", occurrences: 198, formes: "يُكَذِّبُ · تَكْذِيب" },
+  { rang: 451, theme: "Verbes", arabe: "نَبَّأَ", sens: "Informer, annoncer", racine: "ن ب ء", occurrences: 46, formes: "يُنَبِّئُ · تَنْبِئَة" },
+  { rang: 452, theme: "Verbes", arabe: "نَزَّلَ", sens: "Faire descendre, révéler", racine: "ن ز ل", occurrences: 79, formes: "يُنَزِّلُ · تَنْزِيل" },
+  { rang: 453, theme: "Verbes", arabe: "نَجَّى", sens: "Sauver, délivrer", racine: "ن ج و", occurrences: 39, formes: "يُنَجِّي · تَنْجِيَة" },
+  { rang: 454, theme: "Verbes", arabe: "وَلَّى", sens: "Tourner le dos, se détourner", racine: "و ل ي", occurrences: 45, formes: "يُوَلِّي · تَوْلِيَة" },
+  { rang: 455, theme: "Verbes", arabe: "جَاهَدَ", sens: "Lutter, faire effort", racine: "ج ه د", occurrences: 31, formes: "يُجَاهِدُ · جِهَاد" },
+  { rang: 456, theme: "Verbes", arabe: "قَاتَلَ", sens: "Combattre", racine: "ق ت ل", occurrences: 54, formes: "يُقَاتِلُ · قِتَال" },
+  { rang: 457, theme: "Verbes", arabe: "نَادَى", sens: "Appeler, interpeller", racine: "ن د و", occurrences: 44, formes: "يُنَادِي · نِدَاء" },
+  { rang: 458, theme: "Verbes", arabe: "نَافَقَ", sens: "Être hypocrite", racine: "ن ف ق", occurrences: 34, formes: "يُنَافِقُ · نِفَاق" },
+  { rang: 459, theme: "Verbes", arabe: "هَاجَرَ", sens: "Émigrer", racine: "ه ج ر", occurrences: 24, formes: "يُهَاجِرُ · هِجْرَة" },
+  { rang: 460, theme: "Verbes", arabe: "أَبْصَرَ", sens: "Apercevoir, voir", racine: "ب ص ر", occurrences: 36, formes: "يُبْصِرُ · إِبْصَار" },
+  { rang: 461, theme: "Verbes", arabe: "أَحْسَنَ", sens: "Bien faire", racine: "ح س ن", occurrences: 72, formes: "يُحْسِنُ · إِحْسَان" },
+  { rang: 462, theme: "Verbes", arabe: "أَخْرَجَ", sens: "Faire sortir", racine: "خ ر ج", occurrences: 108, formes: "يُخْرِجُ · إِخْرَاج" },
+  { rang: 463, theme: "Verbes", arabe: "أَدْخَلَ", sens: "Faire entrer", racine: "د خ ل", occurrences: 45, formes: "يُدْخِلُ · إِدْخَال" },
+  { rang: 464, theme: "Verbes", arabe: "أَرْجَعَ", sens: "Faire revenir", racine: "ر ج ع", occurrences: 33, formes: "يُرْجِعُ · إِرْجَاع" },
+  { rang: 465, theme: "Verbes", arabe: "أَرْسَلَ", sens: "Envoyer", racine: "ر س ل", occurrences: 135, formes: "يُرْسِلُ · إِرْسَال" },
+  { rang: 466, theme: "Verbes", arabe: "أَسْرَفَ", sens: "Dépasser les limites, gaspiller", racine: "س ر ف", occurrences: 23, formes: "يُسْرِفُ · إِسْرَاف" },
+  { rang: 467, theme: "Verbes", arabe: "أَسْلَمَ", sens: "Se soumettre (à Allah)", racine: "س ل م", occurrences: 72, formes: "يُسْلِمُ · إِسْلَام" },
+  { rang: 468, theme: "Verbes", arabe: "أَشْرَكَ", sens: "Associer (à Allah)", racine: "ش ر ك", occurrences: 120, formes: "يُشْرِكُ · إِشْرَاك" },
+  { rang: 469, theme: "Verbes", arabe: "أَصْبَحَ", sens: "Devenir ; être au matin", racine: "ص ب ح", occurrences: 34, formes: "يُصْبِحُ · إِصْبَاح" },
+  { rang: 470, theme: "Verbes", arabe: "أَصْلَحَ", sens: "Réformer, réconcilier", racine: "ص ل ح", occurrences: 40, formes: "يُصْلِحُ · إِصْلَاح" },
+  { rang: 471, theme: "Verbes", arabe: "أَعْرَضَ", sens: "Se détourner", racine: "ع ر ض", occurrences: 53, formes: "يُعْرِضُ · إِعْرَاض" },
+  { rang: 472, theme: "Verbes", arabe: "أَغْرَقَ", sens: "Noyer", racine: "غ ر ق", occurrences: 21, formes: "يُغْرِقُ · إِغْرَاق" },
+  { rang: 473, theme: "Verbes", arabe: "أَفْسَدَ", sens: "Corrompre, semer le désordre", racine: "ف س د", occurrences: 36, formes: "يُفْسِدُ · إِفْسَاد" },
+  { rang: 474, theme: "Verbes", arabe: "أَفْلَحَ", sens: "Réussir, prospérer", racine: "ف ل ح", occurrences: 40, formes: "يُفْلِحُ · إِفْلَاح" },
+  { rang: 475, theme: "Verbes", arabe: "أَنْبَتَ", sens: "Faire pousser", racine: "ن ب ت", occurrences: 16, formes: "يُنْبِتُ · إِنْبَات" },
+  { rang: 476, theme: "Verbes", arabe: "أَنْذَرَ", sens: "Avertir", racine: "ن ذ ر", occurrences: 70, formes: "يُنْذِرُ · إِنْذَار" },
+  { rang: 477, theme: "Verbes", arabe: "أَنْزَلَ", sens: "Faire descendre, révéler", racine: "ن ز ل", occurrences: 190, formes: "يُنْزِلُ · إِنْزَال" },
+  { rang: 478, theme: "Verbes", arabe: "أَنْشَأَ", sens: "Créer, faire naître", racine: "ن ش ء", occurrences: 22, formes: "يُنْشِئُ · إِنْشَاء" },
+  { rang: 479, theme: "Verbes", arabe: "أَنْعَمَ", sens: "Combler de bienfaits", racine: "ن ع م", occurrences: 17, formes: "يُنْعِمُ · إِنْعَام" },
+  { rang: 480, theme: "Verbes", arabe: "أَنْفَقَ", sens: "Dépenser (dans le bien)", racine: "ن ف ق", occurrences: 69, formes: "يُنْفِقُ · إِنْفَاق" },
+  { rang: 481, theme: "Verbes", arabe: "أَنْكَرَ", sens: "Nier, réprouver", racine: "ن ك ر", occurrences: 25, formes: "يُنْكِرُ · إِنْكَار" },
+  { rang: 482, theme: "Verbes", arabe: "أَهْلَكَ", sens: "Faire périr", racine: "ه ل ك", occurrences: 58, formes: "يُهْلِكُ · إِهْلَاك" },
+  { rang: 483, theme: "Verbes", arabe: "أَتَمَّ", sens: "Achever, parfaire", racine: "ت م م", occurrences: 17, formes: "يُتِمُّ · إِتْمَام" },
+  { rang: 484, theme: "Verbes", arabe: "أَحَبَّ", sens: "Aimer", racine: "ح ب ب", occurrences: 64, formes: "يُحِبُّ · إِحْبَاب" },
+  { rang: 485, theme: "Verbes", arabe: "أَحَلَّ", sens: "Rendre licite", racine: "ح ل ل", occurrences: 21, formes: "يُحِلُّ · إِحْلَال" },
+  { rang: 486, theme: "Verbes", arabe: "أَسَرَّ", sens: "Garder secret", racine: "س ر ر", occurrences: 18, formes: "يُسِرُّ · إِسْرَار" },
+  { rang: 487, theme: "Verbes", arabe: "أَضَلَّ", sens: "Égarer", racine: "ض ل ل", occurrences: 68, formes: "يُضِلُّ · إِضْلَال" },
+  { rang: 488, theme: "Verbes", arabe: "أَعَدَّ", sens: "Préparer", racine: "ع د د", occurrences: 20, formes: "يُعِدُّ · إِعْدَاد" },
+  { rang: 489, theme: "Verbes", arabe: "أَذَاقَ", sens: "Faire goûter", racine: "ذ و ق", occurrences: 22, formes: "يُذِيقُ · إِذَاقَة" },
+  { rang: 490, theme: "Verbes", arabe: "أَرَادَ", sens: "Vouloir", racine: "ر و د", occurrences: 139, formes: "يُرِيدُ · إِرَادَة" },
+  { rang: 491, theme: "Verbes", arabe: "أَصَابَ", sens: "Atteindre, frapper", racine: "ص و ب", occurrences: 65, formes: "يُصِيبُ · إِصَابَة" },
+  { rang: 492, theme: "Verbes", arabe: "أَطَاعَ", sens: "Obéir", racine: "ط و ع", occurrences: 74, formes: "يُطِيعُ · إِطَاعَة" },
+  { rang: 493, theme: "Verbes", arabe: "أَقَامَ", sens: "Accomplir (la prière), établir", racine: "ق و م", occurrences: 67, formes: "يُقِيمُ · إِقَامَة" },
+  { rang: 494, theme: "Verbes", arabe: "أَمَاتَ", sens: "Faire mourir", racine: "م و ت", occurrences: 21, formes: "يُمِيتُ · إِمَاتَة" },
+  { rang: 495, theme: "Verbes", arabe: "أَحْيَا", sens: "Donner la vie", racine: "ح ي ي", occurrences: 53, formes: "يُحْيِي · إِحْيَاء" },
+  { rang: 496, theme: "Verbes", arabe: "أَخْفَى", sens: "Cacher", racine: "خ ف ي", occurrences: 18, formes: "يُخْفِي · إِخْفَاء" },
+  { rang: 497, theme: "Verbes", arabe: "أَرَى", sens: "Montrer", racine: "ر ء ي", occurrences: 44, formes: "يُرِي · إِرَاءَة" },
+  { rang: 498, theme: "Verbes", arabe: "أَغْنَى", sens: "Enrichir, servir à", racine: "غ ن ي", occurrences: 41, formes: "يُغْنِي · إِغْنَاء" },
+  { rang: 499, theme: "Verbes", arabe: "أَلْقَى", sens: "Jeter, lancer", racine: "ل ق ي", occurrences: 71, formes: "يُلْقِي · إِلْقَاء" },
+  { rang: 500, theme: "Verbes", arabe: "أَنْجَى", sens: "Sauver", racine: "ن ج و", occurrences: 23, formes: "يُنْجِي · إِنْجَاء" },
+  { rang: 501, theme: "Verbes", arabe: "أَوْحَى", sens: "Révéler, inspirer", racine: "و ح ي", occurrences: 72, formes: "يُوحِي · إِيحَاء" },
+  { rang: 502, theme: "Verbes", arabe: "أَوْفَى", sens: "Tenir (un engagement)", racine: "و ف ي", occurrences: 18, formes: "يُوفِي · إِيفَاء" },
+  { rang: 503, theme: "Verbes", arabe: "آتَى", sens: "Donner", racine: "ء ت ي", occurrences: 274, formes: "يُؤْتِي · إِيتَاء" },
+  { rang: 504, theme: "Verbes", arabe: "آذَى", sens: "Nuire, offenser", racine: "ء ذ ي", occurrences: 16, formes: "يُؤْذِي · إِيذَاء" },
+  { rang: 505, theme: "Verbes", arabe: "تَفَكَّرَ", sens: "Réfléchir", racine: "ف ك ر", occurrences: 17, formes: "يَتَفَكَّرُ · تَفَكُّر" },
+  { rang: 506, theme: "Verbes", arabe: "تَذَكَّرَ", sens: "Se rappeler", racine: "ذ ك ر", occurrences: 51, formes: "يَتَذَكَّرُ · تَذَكُّر" },
+  { rang: 507, theme: "Verbes", arabe: "تَوَكَّلَ", sens: "Placer sa confiance en", racine: "و ك ل", occurrences: 44, formes: "يَتَوَكَّلُ · تَوَكُّل" },
+  { rang: 508, theme: "Verbes", arabe: "تَبَيَّنَ", sens: "Devenir clair", racine: "ب ي ن", occurrences: 18, formes: "يَتَبَيَّنُ · تَبَيُّن" },
+  { rang: 509, theme: "Verbes", arabe: "تَرَبَّصَ", sens: "Attendre, guetter", racine: "ر ب ص", occurrences: 17, formes: "يَتَرَبَّصُ · تَرَبُّص" },
+  { rang: 510, theme: "Verbes", arabe: "تَوَلَّى", sens: "Se détourner", racine: "و ل ي", occurrences: 79, formes: "يَتَوَلَّى · تَوَلٍّ" },
+  { rang: 511, theme: "Verbes", arabe: "تَوَفَّى", sens: "Reprendre l'âme, faire mourir", racine: "و ف ي", occurrences: 25, formes: "يَتَوَفَّى · تَوَفٍّ" },
+  { rang: 512, theme: "Verbes", arabe: "تَبَارَكَ", sens: "Être béni", racine: "ب ر ك", occurrences: 9 },
+  { rang: 513, theme: "Verbes", arabe: "تَسَاءَلَ", sens: "S'interroger mutuellement", racine: "س ء ل", occurrences: 9, formes: "يَتَسَاءَلُ · تَسَاؤُل" },
+  { rang: 514, theme: "Verbes", arabe: "اخْتَلَفَ", sens: "Diverger", racine: "خ ل ف", occurrences: 52, formes: "يَخْتَلِفُ · اخْتِلَاف" },
+  { rang: 515, theme: "Verbes", arabe: "اتَّبَعَ", sens: "Suivre", racine: "ت ب ع", occurrences: 140, formes: "يَتَّبِعُ · اتِّبَاع" },
+  { rang: 516, theme: "Verbes", arabe: "اتَّخَذَ", sens: "Prendre pour, adopter", racine: "ء خ ذ", occurrences: 128, formes: "يَتَّخِذُ · اتِّخَاذ" },
+  { rang: 517, theme: "Verbes", arabe: "اتَّقَى", sens: "Craindre (Allah), se prémunir", racine: "و ق ي", occurrences: 215, formes: "يَتَّقِي · اتِّقَاء" },
+  { rang: 518, theme: "Verbes", arabe: "افْتَرَى", sens: "Inventer un mensonge", racine: "ف ر ي", occurrences: 59, formes: "يَفْتَرِي · افْتِرَاء" },
+  { rang: 519, theme: "Verbes", arabe: "اهْتَدَى", sens: "Être bien guidé", racine: "ه د ي", occurrences: 61, formes: "يَهْتَدِي · اهْتِدَاء" },
+  { rang: 520, theme: "Verbes", arabe: "ابْتَغَى", sens: "Rechercher, désirer", racine: "ب غ ي", occurrences: 48, formes: "يَبْتَغِي · ابْتِغَاء" },
+  { rang: 521, theme: "Verbes", arabe: "انْقَلَبَ", sens: "Se retourner", racine: "ق ل ب", occurrences: 20, formes: "يَنْقَلِبُ · انْقِلَاب" },
+  { rang: 522, theme: "Verbes", arabe: "انْتَهَى", sens: "Cesser, s'arrêter", racine: "ن ه ي", occurrences: 16, formes: "يَنْتَهِي · انْتِهَاء" },
+  { rang: 523, theme: "Verbes", arabe: "اسْوَدَّ", sens: "Devenir noir, s'assombrir", racine: "س و د", occurrences: 3, formes: "يَسْوَدُّ" },
+  { rang: 524, theme: "Verbes", arabe: "ابْيَضَّ", sens: "Devenir blanc", racine: "ب ي ض", occurrences: 3, formes: "يَبْيَضُّ" },
+  { rang: 525, theme: "Verbes", arabe: "اسْتَعْجَلَ", sens: "Se hâter, presser", racine: "ع ج ل", occurrences: 20, formes: "يَسْتَعْجِلُ · اسْتِعْجَال" },
+  { rang: 526, theme: "Verbes", arabe: "اسْتَغْفَرَ", sens: "Demander pardon", racine: "غ ف ر", occurrences: 42, formes: "يَسْتَغْفِرُ · اسْتِغْفَار" },
+  { rang: 527, theme: "Verbes", arabe: "اسْتَكْبَرَ", sens: "S'enorgueillir", racine: "ك ب ر", occurrences: 48, formes: "يَسْتَكْبِرُ · اسْتِكْبَار" },
+  { rang: 528, theme: "Verbes", arabe: "اسْتَهْزَأَ", sens: "Se moquer", racine: "ه ز ء", occurrences: 23, formes: "يَسْتَهْزِئُ · اسْتِهْزَاء" },
+  { rang: 529, theme: "Verbes", arabe: "اسْتَجَابَ", sens: "Répondre, exaucer", racine: "ج و ب", occurrences: 28, formes: "يَسْتَجِيبُ · اسْتِجَابَة" },
+  { rang: 530, theme: "Verbes", arabe: "اسْتَطَاعَ", sens: "Pouvoir, être capable", racine: "ط و ع", occurrences: 42, formes: "يَسْتَطِيعُ · اسْتِطَاعَة" },
+  { rang: 531, theme: "Verbes", arabe: "اسْتَقَامَ", sens: "Être droit, persévérer", racine: "ق و م", occurrences: 47, formes: "يَسْتَقِيمُ · اسْتِقَامَة" }
+];
+
+/* Invocations classées par thème. Quand l'invocation est un verset, « coran » donne
+   la sourate et le(s) verset(s) pour la récitation. */
+const INVOCATIONS = [
+  { id: "yunus", theme: "Situation difficile", titre: "Débloquer une situation impossible",
+    arabe: "لَا إِلَٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+    phonetique: "Lâ ilâha illâ Anta, subhânaka, innî kuntu mina-z-zâlimîn.",
+    francais: "Pas de divinité à part Toi ! Gloire à Toi ! J'ai été vraiment du nombre des injustes.",
+    source: "Sourate Al-Anbiyâ 21:87 · invocation du prophète Yûnus",
+    note: "Le Prophète ﷺ a dit : aucun musulman ne l'invoque pour quelque chose sans qu'Allah lui réponde (Tirmidhî 3505).",
+    coran: { sourate: 21, versets: [87] } },
+  { id: "hasbuna", theme: "Situation difficile", titre: "Quand on a peur ou qu'on se sent menacé",
+    arabe: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+    phonetique: "Hasbunallâhu wa ni'ma-l-wakîl.",
+    francais: "Allah nous suffit ; Il est notre meilleur garant.",
+    source: "Sourate Âl 'Imrân 3:173",
+    note: "Parole d'Ibrâhîm quand on le jeta dans le feu (Bukhârî 4563). La récitation est celle du verset entier.",
+    coran: { sourate: 3, versets: [173] } },
+
+  { id: "hayy", theme: "Angoisse et tristesse", titre: "Contre l'angoisse et la tristesse",
+    arabe: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ",
+    phonetique: "Yâ Hayyu yâ Qayyûm, bi-rahmatika astaghîth.",
+    francais: "Ô Vivant, ô Celui qui subsiste par Lui-même, c'est par Ta miséricorde que j'implore secours.",
+    source: "Sunan At-Tirmidhî 3524",
+    note: "Le Prophète ﷺ la disait quand une chose l'affligeait." },
+  { id: "hamm", theme: "Angoisse et tristesse", titre: "Contre les soucis, la paresse et les dettes",
+    arabe: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",
+    phonetique: "Allâhumma innî a'ûdhu bika mina-l-hammi wa-l-hazan, wa-l-'ajzi wa-l-kasal, wa-l-bukhli wa-l-jubn, wa dala'i-d-dayni wa ghalabati-r-rijâl.",
+    francais: "Ô Allah, je cherche refuge auprès de Toi contre le souci et la tristesse, l'incapacité et la paresse, l'avarice et la lâcheté, le poids des dettes et la domination des hommes.",
+    source: "Sahîh Al-Bukhârî 6369" },
+
+  { id: "subhan100", theme: "Pardon des péchés", titre: "Le pardon de tes péchés", repetition: "100 fois par jour",
+    arabe: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+    phonetique: "Subhâna-llâhi wa bi-hamdih.",
+    francais: "Gloire et louange à Allah.",
+    source: "Sahîh Al-Bukhârî 6405",
+    note: "Celui qui la dit cent fois dans la journée voit ses péchés effacés, seraient-ils aussi nombreux que l'écume de la mer." },
+  { id: "sayyid", theme: "Pardon des péchés", titre: "Le maître des demandes de pardon (Sayyid al-istighfâr)",
+    arabe: "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي، فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",
+    phonetique: "Allâhumma Anta Rabbî, lâ ilâha illâ Anta, khalaqtanî wa ana 'abduka, wa ana 'alâ 'ahdika wa wa'dika mastata'tu, a'ûdhu bika min sharri mâ sana'tu, abû'u laka bi-ni'matika 'alayya, wa abû'u laka bi-dhanbî, faghfir lî fa-innahu lâ yaghfiru-dh-dhunûba illâ Anta.",
+    francais: "Ô Allah, Tu es mon Seigneur, il n'y a de divinité que Toi. Tu m'as créé et je suis Ton serviteur. Je respecte Ton pacte et Ta promesse autant que je peux. Je cherche refuge auprès de Toi contre le mal que j'ai fait. Je reconnais Tes bienfaits envers moi et je reconnais mon péché : pardonne-moi, car nul ne pardonne les péchés à part Toi.",
+    source: "Sahîh Al-Bukhârî 6306",
+    note: "Dite avec conviction le matin ou le soir, celui qui meurt ce jour-là ou cette nuit-là entre au Paradis." },
+  { id: "adam", theme: "Pardon des péchés", titre: "Le repentir d'Adam et Hawwâ'",
+    arabe: "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+    phonetique: "Rabbanâ zalamnâ anfusanâ, wa in lam taghfir lanâ wa tarhamnâ, la-nakûnanna mina-l-khâsirîn.",
+    francais: "Seigneur, nous nous sommes fait du tort à nous-mêmes. Si Tu ne nous pardonnes pas et ne nous fais pas miséricorde, nous serons certainement du nombre des perdants.",
+    source: "Sourate Al-A'râf 7:23",
+    coran: { sourate: 7, versets: [23] } },
+  { id: "astaghfir", theme: "Pardon des péchés", titre: "Demander pardon chaque jour", repetition: "100 fois par jour",
+    arabe: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+    phonetique: "Astaghfiru-llâha wa atûbu ilayh.",
+    francais: "Je demande pardon à Allah et je me repens à Lui.",
+    source: "Sahîh Muslim 2702 · Sahîh Al-Bukhârî 6307",
+    note: "Le Prophète ﷺ se repentait à Allah cent fois par jour." },
+
+  { id: "bismillah", theme: "Protection", titre: "Pour une protection absolue", repetition: "3 fois matin et soir",
+    arabe: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+    phonetique: "Bismillâhi-lladhî lâ yadurru ma'a-smihi shay'un fi-l-ardi wa lâ fi-s-samâ'i, wa Huwa-s-Samî'u-l-'Alîm.",
+    francais: "Au nom d'Allah, avec le nom de qui rien ne peut nuire, ni sur la terre ni dans le ciel, et Il est Celui qui entend tout, qui sait tout.",
+    source: "Sunan At-Tirmidhî 3388 · Abû Dâwûd 5088",
+    note: "Rien ne lui nuira jusqu'au matin s'il la dit le soir, ni jusqu'au soir s'il la dit le matin." },
+  { id: "kursi", theme: "Protection", titre: "Âyat al-Kursî, le verset du Trône",
+    arabe: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+    phonetique: "Allâhu lâ ilâha illâ Huwa-l-Hayyu-l-Qayyûm. Lâ ta'khudhuhu sinatun wa lâ nawm. Lahu mâ fi-s-samâwâti wa mâ fi-l-ard. Man dha-lladhî yashfa'u 'indahu illâ bi-idhnih. Ya'lamu mâ bayna aydîhim wa mâ khalfahum, wa lâ yuhîtûna bi-shay'in min 'ilmihi illâ bimâ shâ'. Wasi'a kursiyyuhu-s-samâwâti wa-l-ard, wa lâ ya'ûduhu hifzuhumâ, wa Huwa-l-'Aliyyu-l-'Azîm.",
+    francais: "Allah ! Pas de divinité à part Lui, le Vivant, Celui qui subsiste par Lui-même. Ni somnolence ni sommeil ne Le saisissent. À Lui appartient tout ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission ? Il connaît leur passé et leur futur, et de Sa science ils n'embrassent que ce qu'Il veut. Son Trône déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très-Haut, l'Immense.",
+    source: "Sourate Al-Baqara 2:255",
+    note: "Récitée au coucher, un gardien envoyé par Allah te protège jusqu'au matin (Bukhârî 2311).",
+    coran: { sourate: 2, versets: [255] } },
+  { id: "kalimat", theme: "Protection", titre: "Protection en arrivant dans un lieu", repetition: "3 fois le soir",
+    arabe: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+    phonetique: "A'ûdhu bi-kalimâti-llâhi-t-tâmmâti min sharri mâ khalaq.",
+    francais: "Je cherche refuge dans les paroles parfaites d'Allah contre le mal de ce qu'Il a créé.",
+    source: "Sahîh Muslim 2708",
+    note: "Celui qui la dit en s'installant quelque part, rien ne lui nuira jusqu'à ce qu'il quitte cet endroit." },
+
+  { id: "sharr-amal", theme: "Protection", titre: "Contre le mal de mes actes et de ce que je n'ai pas fait",
+    arabe: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ شَرِّ مَا عَمِلْتُ، وَشَرِّ مَا لَمْ أَعْمَلْ",
+    phonetique: "Allâhumma innî a'ûdhu bika min sharri mâ 'amiltu, wa sharri mâ lam a'mal.",
+    francais: "Ô Allah, je cherche refuge auprès de Toi contre le mal de ce que j'ai fait et contre le mal de ce que je n'ai pas fait.",
+    source: "Sahîh Muslim 2716" },
+  { id: "hasbiya", theme: "Protection", titre: "Allah me suffit", repetition: "7 fois matin et soir",
+    arabe: "حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+    phonetique: "Hasbiya-llâhu lâ ilâha illâ Huwa, 'alayhi tawakkaltu, wa Huwa Rabbu-l-'arshi-l-'azîm.",
+    francais: "Allah me suffit, il n'y a de divinité que Lui. C'est en Lui que je place ma confiance, et Il est le Seigneur du Trône immense.",
+    source: "Sourate At-Tawba 9:129 · Abû Dâwûd 5081",
+    note: "Celui qui la dit sept fois matin et soir, Allah lui suffit contre ce qui le préoccupe. La récitation est celle du verset entier.",
+    coran: { sourate: 9, versets: [129] } },
+  { id: "bismika", theme: "Au quotidien", titre: "Avant de dormir",
+    arabe: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+    phonetique: "Bismika-llâhumma amûtu wa ahyâ.",
+    francais: "En Ton nom, ô Allah, je meurs et je vis.",
+    source: "Sahîh Al-Bukhârî 6324",
+    note: "Le Prophète ﷺ la disait en se couchant." },
+  { id: "tonnerre", theme: "Au quotidien", titre: "En entendant le tonnerre",
+    arabe: "سُبْحَانَ الَّذِي يُسَبِّحُ الرَّعْدُ بِحَمْدِهِ وَالْمَلَائِكَةُ مِنْ خِيفَتِهِ",
+    phonetique: "Subhâna-lladhî yusabbihu-r-ra'du bi-hamdihi wa-l-malâ'ikatu min khîfatih.",
+    francais: "Gloire à Celui que le tonnerre glorifie par Sa louange, ainsi que les anges, par crainte de Lui.",
+    source: "Al-Muwatta' de l'imam Mâlik · Al-Adab al-Mufrad 723",
+    note: "Ce n'est pas un hadith du Prophète ﷺ mais la pratique du compagnon 'Abdullah ibn az-Zubayr : il cessait de parler en entendant le tonnerre et disait ces mots, tirés de la sourate Ar-Ra'd 13:13." },
+  { id: "atina", theme: "Études, réussite et facilité", titre: "Pour la réussite dans les deux vies",
+    arabe: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+    phonetique: "Rabbanâ âtinâ fi-d-dunyâ hasanatan wa fi-l-âkhirati hasanatan wa qinâ 'adhâba-n-nâr.",
+    francais: "Seigneur, accorde-nous une belle part ici-bas, une belle part dans l'au-delà, et protège-nous du châtiment du Feu.",
+    source: "Sourate Al-Baqara 2:201 · Sahîh Al-Bukhârî 4522",
+    note: "C'était l'invocation que le Prophète ﷺ faisait le plus souvent.",
+    coran: { sourate: 2, versets: [201] } },
+  { id: "sharh", theme: "Études, réussite et facilité", titre: "Avant un examen, un entretien ou une prise de parole",
+    arabe: "رَبِّ اشْرَحْ لِي صَدْرِي ۝ وَيَسِّرْ لِي أَمْرِي ۝ وَاحْلُلْ عُقْدَةً مِنْ لِسَانِي ۝ يَفْقَهُوا قَوْلِي",
+    phonetique: "Rabbi-shrah lî sadrî, wa yassir lî amrî, wa-hlul 'uqdatan min lisânî, yafqahû qawlî.",
+    francais: "Seigneur, ouvre-moi ma poitrine, facilite-moi ma mission, et dénoue un nœud de ma langue, afin qu'ils comprennent mes paroles.",
+    source: "Sourate Tâ-Hâ 20:25-28 · invocation du prophète Mûsâ",
+    coran: { sourate: 20, versets: [25, 26, 27, 28] } },
+  { id: "ilm", theme: "Études, réussite et facilité", titre: "Pour augmenter en science",
+    arabe: "رَبِّ زِدْنِي عِلْمًا",
+    phonetique: "Rabbi zidnî 'ilmâ.",
+    francais: "Seigneur, accrois ma science.",
+    source: "Sourate Tâ-Hâ 20:114",
+    note: "La récitation est celle du verset entier ; l'invocation en est la fin.",
+    coran: { sourate: 20, versets: [114] } },
+  { id: "sahl", theme: "Études, réussite et facilité", titre: "Quand une chose paraît difficile",
+    arabe: "اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا",
+    phonetique: "Allâhumma lâ sahla illâ mâ ja'altahu sahlâ, wa Anta taj'alu-l-hazna idhâ shi'ta sahlâ.",
+    francais: "Ô Allah, rien n'est facile sauf ce que Tu rends facile, et Tu rends facile la difficulté quand Tu le veux.",
+    source: "Sahîh Ibn Hibbân 974" },
+
+  { id: "ilmnafi", theme: "Études, réussite et facilité", titre: "Contre une science qui ne profite pas",
+    arabe: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عِلْمٍ لَا يَنْفَعُ، وَمِنْ قَلْبٍ لَا يَخْشَعُ، وَمِنْ نَفْسٍ لَا تَشْبَعُ، وَمِنْ دَعْوَةٍ لَا يُسْتَجَابُ لَهَا",
+    phonetique: "Allâhumma innî a'ûdhu bika min 'ilmin lâ yanfa', wa min qalbin lâ yakhsha', wa min nafsin lâ tashba', wa min da'watin lâ yustajâbu lahâ.",
+    francais: "Ô Allah, je cherche refuge auprès de Toi contre une science qui ne profite pas, un cœur qui ne s'humilie pas, une âme qui ne se rassasie pas et une invocation qui n'est pas exaucée.",
+    source: "Sahîh Muslim 2722" },
+  { id: "faqir", theme: "Travail et subsistance", titre: "Pour le travail et la subsistance",
+    arabe: "رَبِّ إِنِّي لِمَا أَنْزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ",
+    phonetique: "Rabbi innî limâ anzalta ilayya min khayrin faqîr.",
+    francais: "Seigneur, j'ai grand besoin de tout bien que Tu feras descendre vers moi.",
+    source: "Sourate Al-Qasas 28:24 · invocation du prophète Mûsâ",
+    note: "La récitation est celle du verset entier ; l'invocation en est la fin.",
+    coran: { sourate: 28, versets: [24] } },
+  { id: "halal", theme: "Travail et subsistance", titre: "Pour un gain licite et ne dépendre de personne",
+    arabe: "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+    phonetique: "Allâhumma-kfinî bi-halâlika 'an harâmik, wa aghninî bi-fadlika 'amman siwâk.",
+    francais: "Ô Allah, fais que le licite me suffise pour me passer de l'illicite, et enrichis-moi par Ta grâce pour que je n'aie besoin de personne d'autre que Toi.",
+    source: "Sunan At-Tirmidhî 3563",
+    note: "Enseignée par 'Alî pour s'acquitter de ses dettes." },
+  { id: "rizq", theme: "Travail et subsistance", titre: "Chaque matin après la prière du Fajr",
+    arabe: "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا",
+    phonetique: "Allâhumma innî as'aluka 'ilman nâfi'â, wa rizqan tayyibâ, wa 'amalan mutaqabbalâ.",
+    francais: "Ô Allah, je Te demande une science utile, une subsistance pure et des œuvres acceptées.",
+    source: "Sunan Ibn Mâjah 925" },
+
+  { id: "dettes", theme: "Travail et subsistance", titre: "Pour être soulagé de ses dettes",
+    arabe: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ",
+    phonetique: "Allâhumma innî a'ûdhu bika min ghalabati-d-dayni wa qahri-r-rijâl.",
+    francais: "Ô Allah, je cherche refuge auprès de Toi contre le poids des dettes et le fait d'être dominé par les hommes.",
+    source: "Sunan Abî Dâwûd 1555",
+    note: "Une invocation à placer dans tes moments de difficulté et de préoccupation." },
+  { id: "fadl", theme: "Vœux et exaucement", titre: "Pour que tes vœux se réalisent",
+    arabe: "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ وَرَحْمَتِكَ، فَإِنَّهُ لَا يَمْلِكُهَا إِلَّا أَنْتَ",
+    phonetique: "Allâhumma innî as'aluka min fadlika wa rahmatika, fa-innahu lâ yamlikuhâ illâ Anta.",
+    francais: "Ô Allah, je Te demande de Ta grâce et de Ta miséricorde, car nul autre que Toi ne les possède.",
+    source: "At-Tabarânî, Al-Mu'jam al-Kabîr 10379" },
+  { id: "nuit", theme: "Vœux et exaucement", titre: "En se réveillant la nuit",
+    arabe: "لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ، الْحَمْدُ لِلَّهِ، وَسُبْحَانَ اللَّهِ، وَلَا إِلَٰهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ ۝ اللَّهُمَّ اغْفِرْ لِي",
+    phonetique: "Lâ ilâha illa-llâhu wahdahu lâ sharîka lah, lahu-l-mulku wa lahu-l-hamd, wa Huwa 'alâ kulli shay'in qadîr. Al-hamdu lillâh, wa subhâna-llâh, wa lâ ilâha illa-llâh, wa-llâhu akbar, wa lâ hawla wa lâ quwwata illâ billâh. Puis : Allâhumma-ghfir lî.",
+    francais: "Pas de divinité à part Allah, Seul, sans associé. À Lui la royauté et la louange, et Il est capable de toute chose. Louange à Allah, gloire à Allah, pas de divinité à part Allah, Allah est le plus grand, il n'y a de force ni de puissance qu'en Allah. Puis : Ô Allah, pardonne-moi.",
+    source: "Sahîh Al-Bukhârî 1154",
+    note: "Celui qui se réveille la nuit, dit ces paroles puis demande pardon ou invoque, est exaucé ; s'il fait ses ablutions et prie, sa prière est acceptée." },
+
+  { id: "omra", theme: "Vœux et exaucement", titre: "Pour accomplir la 'Umra",
+    arabe: "اللَّهُمَّ ارْزُقْنِي زِيَارَةَ بَيْتِكَ الْحَرَامِ عُمْرَةً",
+    phonetique: "Allâhumma-rzuqnî ziyârata Baytika-l-Harâmi 'umratan.",
+    francais: "Ô Allah, accorde-moi de visiter Ta Maison sacrée afin d'accomplir la 'Umra.",
+    source: "Invocation libre",
+    note: "Tu peux demander à Allah avec tes propres mots, avec sincérité et confiance." },
+  { id: "maison", theme: "Vœux et exaucement", titre: "Pour une maison",
+    arabe: "اللَّهُمَّ ارْزُقْنِي بَيْتًا جَمِيلًا مُبَارَكًا يَكُونُ لِي سَكَنًا وَرَاحَةً",
+    phonetique: "Allâhumma-rzuqnî baytan jamîlan mubârakan yakûnu lî sakanan wa râhah.",
+    francais: "Ô Allah, accorde-moi une belle maison bénie, qui soit pour moi un lieu de tranquillité et de repos.",
+    source: "Invocation libre",
+    note: "Demande à Allah ce que ton cœur désire, sans oublier de Lui demander ce qui est meilleur pour toi." },
+  { id: "famille", theme: "Famille", titre: "Pour son conjoint et ses enfants",
+    arabe: "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+    phonetique: "Rabbanâ hab lanâ min azwâjinâ wa dhurriyyâtinâ qurrata a'yunin, wa-j'alnâ li-l-muttaqîna imâmâ.",
+    francais: "Seigneur, donne-nous, en nos épouses et nos descendants, la joie des yeux, et fais de nous un guide pour les pieux.",
+    source: "Sourate Al-Furqân 25:74",
+    coran: { sourate: 25, versets: [74] } },
+  { id: "parents", theme: "Famille", titre: "Pour ses parents, vivants ou morts",
+    arabe: "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
+    phonetique: "Rabbi-ghfir lî wa li-wâlidayya, wa-rhamhumâ kamâ rabbayânî saghîrâ.",
+    francais: "Seigneur, pardonne-moi ainsi qu'à mes parents, et fais-leur miséricorde comme ils m'ont élevé quand j'étais petit.",
+    source: "Inspirée de Nûh 71:28 et Al-Isrâ' 17:24",
+    note: "N'oublie pas tes parents dans tes invocations. La récitation est celle du verset 17:24, d'où vient la seconde partie.",
+    coran: { sourate: 17, versets: [24] } },
+
+  { id: "enfant", theme: "Famille", titre: "Pour l'éducation de son enfant",
+    arabe: "اللَّهُمَّ إِنِ اجْتَهَدْتُ فِي تَأْدِيبِ ابْنِي فَلَمْ أَسْتَطِعْ، فَأَدِّبْهُ لِي",
+    phonetique: "Allâhumma in ijtahadtu fî ta'dîbi ibnî fa lam astati', fa addibhu lî.",
+    francais: "Ô Allah, si j'ai fait tout mon possible pour éduquer mon fils et que je n'y suis pas parvenu, alors éduque-le pour moi.",
+    source: "Invocation libre",
+    note: "Pour une fille : « fî ta'dîbi ibnatî… fa addibhâ lî » (فِي تَأْدِيبِ ابْنَتِي… فَأَدِّبْهَا لِي). La capture ne donne pas de source et je n'en ai pas trouvé de fiable : on peut la dire comme une invocation personnelle." },
+  { id: "ayyub", theme: "Maladie et épreuve", titre: "Dans la maladie et l'épreuve",
+    arabe: "أَنِّي مَسَّنِيَ الضُّرُّ وَأَنْتَ أَرْحَمُ الرَّاحِمِينَ",
+    phonetique: "Annî massaniya-d-durru wa Anta arhamu-r-râhimîn.",
+    francais: "Le mal m'a touché, et Tu es le plus miséricordieux des miséricordieux.",
+    source: "Sourate Al-Anbiyâ 21:83 · invocation du prophète Ayyûb",
+    coran: { sourate: 21, versets: [83] } },
+  { id: "shifa", theme: "Maladie et épreuve", titre: "Pour la guérison d'un malade",
+    arabe: "أَذْهِبِ الْبَأْسَ رَبَّ النَّاسِ، اشْفِ أَنْتَ الشَّافِي، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا",
+    phonetique: "Adh-hibi-l-ba'sa Rabba-n-nâs, ishfi Anta-sh-Shâfî, lâ shifâ'a illâ shifâ'uk, shifâ'an lâ yughâdiru saqamâ.",
+    francais: "Fais disparaître le mal, Seigneur des hommes. Guéris, Tu es Celui qui guérit. Il n'y a de guérison que la Tienne, une guérison qui ne laisse aucune maladie.",
+    source: "Sahîh Al-Bukhârî 5743",
+    note: "Le Prophète ﷺ la disait en passant la main droite sur le malade." }
+];
+
+/* Fiches de connaissances générales. « coran » permet d'écouter le verset cité. */
+const SAVOIR = [
+  { id: "anges", titre: "Les anges les plus connus en islam",
+    intro: "Croire aux anges est l'un des six piliers de la foi. Ils sont créés de lumière (Muslim 2996) et obéissent à Allah sans jamais Lui désobéir (sourate At-Tahrîm 66:6).",
+    items: [
+      { arabe: "جِبْرِيل", phonetique: "Jibrîl", role: "Transmet la révélation aux prophètes. Le Coran l'appelle aussi « l'Esprit fidèle » (ar-Rûh al-Amîn).",
+        preuve: "Sourate Al-Baqara 2:97 · Ash-Shu'arâ' 26:193", coran: { sourate: 26, versets: [193] } },
+      { arabe: "مِيكَائِيل", phonetique: "Mîkâ'îl", role: "Chargé de la pluie, et donc de la végétation et de la subsistance.",
+        preuve: "Nommé dans Al-Baqara 2:98 ; son rôle est rapporté par les savants du tafsîr (Ibn Kathîr)", coran: { sourate: 2, versets: [98] },
+        correction: "Votre capture dit « pesée des actes » : ce n'est pas son rôle connu." },
+      { arabe: "إِسْرَافِيل", phonetique: "Isrâfîl", role: "Soufflera dans la Trompe (as-Sûr) à la fin des temps, puis pour la résurrection.",
+        preuve: "Sourate Az-Zumar 39:68 · son nom est cité dans Sahîh Muslim 770", coran: { sourate: 39, versets: [68] },
+        correction: "Le verset mentionne deux souffles ; certains savants en comptent trois." },
+      { arabe: "مَلَكُ الْمَوْتِ", phonetique: "Malak al-mawt", role: "L'ange de la mort, chargé de reprendre les âmes.",
+        preuve: "Sourate As-Sajda 32:11", coran: { sourate: 32, versets: [11] },
+        correction: "Le nom « 'Azrâ'îl » ou « Izra'il » ne figure ni dans le Coran ni dans un hadith authentique : les textes disent « l'ange de la mort »." },
+      { arabe: "مَالِك", phonetique: "Mâlik", role: "Le gardien de l'Enfer.",
+        preuve: "Sourate Az-Zukhruf 43:77", coran: { sourate: 43, versets: [77] } },
+      { arabe: "رِضْوَان", phonetique: "Ridwân", role: "Connu comme le gardien du Paradis.",
+        preuve: "Son nom vient de récits rapportés par les savants ; il n'est pas cité dans le Coran, qui parle des « gardiens » du Paradis (Az-Zumar 39:73)", coran: { sourate: 39, versets: [73] } },
+      { arabe: "مُنْكَر وَنَكِير", phonetique: "Munkar et Nakîr", role: "Les deux anges qui interrogent le mort dans la tombe : qui est ton Seigneur, quelle est ta religion, qui est ton prophète.",
+        preuve: "Sunan At-Tirmidhî 1071" },
+      { arabe: "رَقِيبٌ عَتِيدٌ", phonetique: "Raqîb et 'Atîd", role: "Les anges qui notent nos paroles et nos actes : l'un à droite pour les bonnes actions, l'autre à gauche pour les mauvaises.",
+        preuve: "Sourate Qâf 50:17-18 : « Il ne prononce pas une parole sans avoir auprès de lui un observateur prêt (raqîbun 'atîd). »", coran: { sourate: 50, versets: [17, 18] },
+        correction: "On écrit 'Atîd et non « Hatid ». Beaucoup de savants y voient deux qualités (« observateur » et « prêt ») plutôt que deux noms propres." }
+    ] }
+];
+
+/* Récitateurs disponibles (fichiers mp3 verset par verset sur everyayah.com). */
+const RECITATEURS = [
+  { nom: "Abdul Rahman Al-Sudais", base: "https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/" },
+  { nom: "Mishary Al-Afasy",       base: "https://everyayah.com/data/Alafasy_128kbps/" },
+  { nom: "Mahmoud Al-Husary",      base: "https://everyayah.com/data/Husary_128kbps/" }
+];
+const TOTAL_MOTS_CORAN = 77430;
+const BASE_MOT_A_MOT = "https://audio.qurancdn.com/wbw/";
+
+/* Dans un aperçu intégré (iframe), les fichiers audio externes sont bloqués :
+   les boutons ouvrent alors la récitation dans un nouvel onglet. */
+const MODE_LIEN = (() => { try { return window.self !== window.top; } catch { return true; } })();
+
+/* ---------- Stockage local (protégé) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+
+const PAGE = 40;
+const state = {
+  appris: new Set(store.get("vc-appris", [])),
+  theme: "",
+  tri: "rang",
+  limite: PAGE,
+  filtre: "all",
+  recherche: "",
+  recitateur: store.get("vc-recitateur", 0)
+};
+
+/* ---------- Utilitaires ---------- */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad3 = (n) => String(n).padStart(3, "0");
+const fmt = (n) => n.toLocaleString("fr-FR");
+
+// Retire voyelles/tashkil et unifie les alifs pour une recherche tolérante.
+const normAr = (s) => s.replace(/[ً-ٰٟۖ-ۭـ]/g, "").replace(/[إأآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه");
+const normLat = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/['’ʼ]/g, "");
+const norm = (s) => normLat(normAr(s));
+
+const ICON_PLAY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+const ICON_STOP = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
+
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => (t.hidden = true), 3800);
+}
+
+/* ---------- Audio ---------- */
+const lecteur = new Audio();
+lecteur.preload = "none";
+let boutonActif = null;
+
+function marquer(btn, actif) {
+  if (!btn) return;
+  btn.dataset.playing = actif ? "true" : "false";
+  btn.innerHTML = actif ? ICON_STOP : ICON_PLAY;
+}
+
+function stopTout() {
+  lecteur.pause();
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  marquer(boutonActif, false);
+  boutonActif = null;
+}
+
+function parler(texte, btn) {
+  if (!("speechSynthesis" in window)) { toast("La synthèse vocale n'est pas disponible dans ce navigateur."); marquer(btn, false); return; }
+  const u = new SpeechSynthesisUtterance(texte);
+  u.lang = "ar-SA"; u.rate = 0.75;
+  const voix = speechSynthesis.getVoices().find((v) => v.lang && v.lang.toLowerCase().startsWith("ar"));
+  if (voix) u.voice = voix;
+  else toast("Aucune voix arabe installée : la prononciation peut être approximative.");
+  u.onend = u.onerror = () => { if (boutonActif === btn) { marquer(btn, false); boutonActif = null; } };
+  speechSynthesis.speak(u);
+}
+
+function jouer(btn, { url, texte }) {
+  const memeBouton = boutonActif === btn;
+  stopTout();
+  if (memeBouton) return;            // second clic = arrêt
+  boutonActif = btn;
+  marquer(btn, true);
+  if (!url) { parler(texte, btn); return; }
+  const file = Array.isArray(url) ? [...url] : [url];
+  lecteur.src = file.shift();
+  lecteur.onended = () => {
+    if (boutonActif !== btn) return;
+    if (file.length) { lecteur.src = file.shift(); lecteur.play().catch(() => lecteur.onerror()); return; }
+    marquer(btn, false); boutonActif = null;
+  };
+  lecteur.onerror = () => {
+    if (boutonActif !== btn) return;
+    marquer(btn, false); boutonActif = null;
+    toast("Impossible de charger la récitation. Vérifiez votre connexion Internet.");
+  };
+  lecteur.play().catch(() => lecteur.onerror());
+}
+
+const urlMot = (m) => m.audioMot || (m.motAudio
+  ? BASE_MOT_A_MOT + [m.motAudio.sourate, m.motAudio.verset, m.motAudio.position].map(pad3).join("_") + ".mp3"
+  : null);
+const urlVerset = (v) => RECITATEURS[state.recitateur].base + pad3(v.numSourate) + pad3(v.numVerset) + ".mp3";
+
+/* ---------- Rendu ---------- */
+function surligner(verset) {
+  const t = esc(verset.arabe);
+  if (!verset.surligner) return t;
+  const m = esc(verset.surligner);
+  const i = t.indexOf(m);
+  return i < 0 ? t : t.slice(0, i) + "<mark>" + m + "</mark>" + t.slice(i + m.length);
+}
+
+function boutonAudio(type, url, label, extra = "") {
+  if (MODE_LIEN && url) {
+    return `<a class="play ${extra}" href="${esc(url)}" target="_blank" rel="noopener" aria-label="${esc(label)} (nouvel onglet)">${ICON_PLAY}</a>`;
+  }
+  return `<button class="play ${extra}" type="button" data-audio="${type}" aria-label="${esc(label)}">${ICON_PLAY}</button>`;
+}
+
+/* ---------- Décomposition lettre par lettre ---------- */
+const LETTRES = {
+  "ا": ["Alif", "â"], "ٱ": ["Alif wasla", ""], "أ": ["Alif + hamza", "'"], "إ": ["Alif + hamza dessous", "'"], "آ": ["Alif madda", "'â"],
+  "ء": ["Hamza", "'"], "ؤ": ["Wâw + hamza", "'"], "ئ": ["Yâ' + hamza", "'"],
+  "ب": ["Bâ'", "b"], "ت": ["Tâ'", "t"], "ث": ["Thâ'", "th"], "ج": ["Jîm", "j"], "ح": ["Ḥâ'", "ḥ"], "خ": ["Khâ'", "kh"],
+  "د": ["Dâl", "d"], "ذ": ["Dhâl", "dh"], "ر": ["Râ'", "r"], "ز": ["Zây", "z"], "س": ["Sîn", "s"], "ش": ["Chîn", "ch"],
+  "ص": ["Ṣâd", "ṣ"], "ض": ["Ḍâd", "ḍ"], "ط": ["Ṭâ'", "ṭ"], "ظ": ["Ẓâ'", "ẓ"], "ع": ["'Ayn", "'"], "غ": ["Ghayn", "gh"],
+  "ف": ["Fâ'", "f"], "ق": ["Qâf", "q"], "ك": ["Kâf", "k"], "ل": ["Lâm", "l"], "م": ["Mîm", "m"], "ن": ["Noûn", "n"],
+  "ه": ["Hâ'", "h"], "و": ["Wâw", "w"], "ي": ["Yâ'", "y"], "ى": ["Alif maqsoura", "â"], "ة": ["Tâ' marbouta", "t / h"]
+};
+const SIGNES = {
+  "َ": ["fatḥa", "a"], "ِ": ["kasra", "i"], "ُ": ["ḍamma", "ou"], "ْ": ["soukoun", ""],
+  "ً": ["tanwîn fatḥa", "an"], "ٍ": ["tanwîn kasra", "in"], "ٌ": ["tanwîn ḍamma", "oun"],
+  "ّ": ["chadda", ""], "ٰ": ["alif suscrit", "â"], "ٓ": ["madda", ""], "ٔ": ["hamza", ""]
+};
+
+function decomposer(mot) {
+  const lettres = [];
+  for (const c of mot.replace(/ـ/g, "")) {
+    if (SIGNES[c] && lettres.length) lettres[lettres.length - 1].signes.push(c);
+    else if (LETTRES[c]) lettres.push({ c, signes: [] });
+  }
+  return lettres.map((x, i) => {
+    const [nom, cons] = LETTRES[x.c];
+    const chadda = x.signes.includes("ّ");
+    const voy = x.signes.filter((g) => g !== "ّ" && g !== "ْ");
+    const prev = lettres[i - 1];
+    const prevVoy = prev ? prev.signes.find((g) => SIGNES[g] && "َُِ".includes(g)) : null;
+    let son, muet = false, note = voy.map((g) => SIGNES[g][0]);
+    if (chadda) note.unshift("chadda (doublée)");
+    if (x.signes.includes("ْ")) note.push("soukoun (sans voyelle)");
+    if (!x.signes.length && x.c === "ا" && i === 0) { son = "(a)"; muet = true; note = ["alif de liaison"]; }
+    else if (!x.signes.length && (x.c === "ا" || x.c === "ى")) { son = "â"; note = ["allonge le « a »"]; }
+    else if (!x.signes.length && x.c === "و" && prevVoy === "ُ") { son = "oû"; note = ["allonge le « ou »"]; }
+    else if (!x.signes.length && x.c === "ي" && prevVoy === "ِ") { son = "î"; note = ["allonge le « i »"]; }
+    else if (!x.signes.length && x.c === "ة") { son = "h"; note = ["marque du féminin, « h » à la pause"]; }
+    else if (!x.signes.length && i === lettres.length - 1 && i > 0 && lettres[i - 1].c === "ل" && lettres[i - 1].signes.length === 0) { son = cons; }
+    else {
+      const base = x.c === "ة" ? "t" : cons;
+      son = (chadda ? base + base : base) + voy.map((g) => SIGNES[g][1]).join("");
+      if (x.c === "آ") son = "'â";
+    }
+    if (!x.signes.length && !note.length) note = ["sans voyelle"];
+    return { lettre: x.c + x.signes.join(""), nom, son, note: note.join(" + "), muet };
+  });
+}
+
+function blocDecomposition(mot) {
+  const tuiles = decomposer(mot.arabe).map((t) => `<div class="tile rounded-xl ${t.muet ? "muet" : ""}">
+      <span class="l" lang="ar">${esc(t.lettre)}</span><span class="n">${esc(t.nom)}</span>
+      <span class="v">${esc(t.note)}</span><span class="s">${esc(t.son)}</span></div>`).join("");
+  return `<details class="decomp rounded-2xl p-4" open>
+    <summary>Décomposition du mot</summary>
+    <div class="tiles">${tuiles}</div>
+    ${mot.racine ? `<div class="flex items-center gap-3 mt-4"><span class="text-sm font-semibold">Racine :</span><div class="root" lang="ar">${mot.racine.split(" ").map((l) => `<span>${esc(l)}</span>`).join("")}</div></div>` : ""}
+    ${mot.formation ? `<p class="text-sm mt-3">${arIso(mot.formation)}</p>` : ""}
+  </details>`;
+}
+
+// Isole les passages arabes dans une phrase française pour garder le bon ordre de lecture.
+const arIso = (t) => esc(t).replace(/[\u0600-\u06FF]+(?:\s[\u0600-\u06FF]+)*/g, (m) => `<bdi lang="ar" class="ar-inline">${m}</bdi>`);
+
+function listeSens(sens) {
+  return sens.split(/\s*;\s*/).map((x) => `<li>${arIso(x)}</li>`).join("");
+}
+
+function carte(mot) {
+  const appris = state.appris.has(mot.rang);
+  const v = mot.verset;
+  const formes = [{ arabe: mot.arabe, phonetique: mot.phonetique, main: true }, ...(mot.variantes || [])];
+  const urlM = urlMot(mot);
+  return `
+  <article class="card ${appris ? "learned" : ""} rounded-2xl p-5 flex flex-col gap-4 min-w-0" data-rang="${mot.rang}">
+    <div class="head">
+      <div class="flex items-center gap-3">
+        <div class="rank num">${mot.rang}</div>
+        ${urlM ? boutonAudio("mot", urlM, "Écouter le mot " + (mot.phonetique || mot.arabe)) : ""}
+      </div>
+      <div class="forms" lang="ar">
+        ${formes.map((f) => `<div class="form ${f.main ? "main" : ""}">
+          <span class="word">${esc(f.arabe)}${f.note ? `<span class="tag"> ${esc(f.note)}</span>` : ""}</span>
+          ${f.phonetique ? `<span class="phon">${esc(f.phonetique)}</span>` : ""}
+        </div>`).join("")}
+      </div>
+    </div>
+
+    <div class="sig rounded-2xl" ${mot.occurrences ? "" : 'style="padding-right:18px"'}>
+      <h3>Signification :</h3>
+      <ul>${listeSens(mot.sens)}</ul>
+      ${mot.formes ? `<p class="formes" lang="ar">${esc(mot.formes)}</p>` : ""}
+      ${mot.occurrences ? `<div class="badge" title="${fmt(mot.occurrences)} fois mentionné dans le Coran"><b>${fmt(mot.occurrences)}</b><span>fois mentionné<br>dans le Coran</span></div>` : ""}
+    </div>
+
+    ${blocDecomposition(mot)}
+
+    ${v ? `<div class="ex rounded-2xl p-4 flex flex-col gap-1">
+      <div class="flex items-center justify-between gap-3">
+        <h3>Exemple dans le Coran :</h3>
+        ${boutonAudio("verset", urlVerset(v), `Écouter le verset ${v.numSourate}:${v.numVerset}`, "small")}
+      </div>
+      <p class="ar" lang="ar"><span class="orn">﴿</span> ${surligner(v)} <span class="orn">﴾</span></p>
+      <p class="text-sm text-center">${esc(v.traduction)}</p>
+      <p class="ref text-sm text-center num">Sourate ${v.numSourate} – Verset ${v.numVerset} · ${esc(v.sourate)}</p>
+    </div>` : `<p class="pending rounded-2xl px-4 py-3 text-sm">Exemple dans le Coran à venir.</p>`}
+
+    <div class="mt-auto flex items-center justify-between gap-3">
+      <span class="theme-tag">${esc(mot.theme || "")}</span>
+      <button class="learn-btn rounded-xl px-4 py-2 text-sm font-semibold" type="button" data-learn aria-pressed="${appris}">
+        ${appris ? "✓ Appris" : "Marquer comme appris"}
+      </button>
+    </div>
+  </article>`;
+}
+
+function filtrer() {
+  const q = norm(state.recherche.trim());
+  const liste = VOCABULAIRE.filter((m) => {
+    if (state.filtre === "done" && !state.appris.has(m.rang)) return false;
+    if (state.filtre === "todo" && state.appris.has(m.rang)) return false;
+    if (state.theme && m.theme !== state.theme) return false;
+    if (!q) return true;
+    const v = m.verset || {};
+    const variantes = (m.variantes || []).map((x) => x.arabe + " " + (x.phonetique || "")).join(" ");
+    return norm([m.arabe, m.phonetique || "", m.sens, m.formes || "", variantes, v.sourate || "", v.traduction || ""].join(" ")).includes(q);
+  });
+  if (state.tri === "freq") liste.sort((a, b) => (b.occurrences || 0) - (a.occurrences || 0));
+  return liste;
+}
+
+function rendre(garderLimite) {
+  stopTout();
+  if (!garderLimite) state.limite = PAGE;
+  const liste = filtrer();
+  $("#grid").innerHTML = liste.slice(0, state.limite).map(carte).join("");
+  $("#empty").hidden = liste.length > 0;
+  $("#plus").hidden = liste.length <= state.limite;
+  $("#plus").textContent = `Afficher plus de mots (${liste.length - Math.min(state.limite, liste.length)} restants)`;
+  progression();
+}
+
+function progression() {
+  const total = VOCABULAIRE.length;
+  const n = VOCABULAIRE.filter((m) => state.appris.has(m.rang)).length;
+  const pct = total ? Math.round((n / total) * 100) : 0;
+  const occ = VOCABULAIRE.filter((m) => state.appris.has(m.rang)).reduce((s, m) => s + (m.occurrences || 0), 0);
+  $("#learnedCount").textContent = n;
+  $("#totalCount").textContent = total;
+  $("#pct").textContent = pct + " %";
+  $("#barFill").style.width = pct + "%";
+  $("#bar").setAttribute("aria-valuenow", pct);
+  $("#coverage").textContent = `Vous reconnaissez ${fmt(occ)} mots sur ~${fmt(TOTAL_MOTS_CORAN)} (${((occ / TOTAL_MOTS_CORAN) * 100).toFixed(1).replace(".", ",")} % du texte).`;
+}
+
+/* ---------- Événements ---------- */
+$("#grid").addEventListener("click", (e) => {
+  const cardEl = e.target.closest(".card");
+  if (!cardEl) return;
+  const mot = VOCABULAIRE.find((m) => m.rang === Number(cardEl.dataset.rang));
+
+  const btnAudio = e.target.closest("[data-audio]");
+  if (btnAudio) {
+    if (btnAudio.dataset.audio === "mot") jouer(btnAudio, { url: urlMot(mot), texte: mot.arabe });
+    else jouer(btnAudio, { url: urlVerset(mot.verset), texte: mot.verset.arabe });
+    return;
+  }
+
+  const btnLearn = e.target.closest("[data-learn]");
+  if (btnLearn) {
+    state.appris.has(mot.rang) ? state.appris.delete(mot.rang) : state.appris.add(mot.rang);
+    store.set("vc-appris", [...state.appris]);
+    const appris = state.appris.has(mot.rang);
+    if (state.filtre !== "all") { rendre(); return; }
+    cardEl.classList.toggle("learned", appris);
+    btnLearn.setAttribute("aria-pressed", appris);
+    btnLearn.textContent = appris ? "✓ Appris" : "Marquer comme appris";
+    progression();
+  }
+});
+
+$("#search").addEventListener("input", (e) => { state.recherche = e.target.value; rendre(); });
+$("#plus").addEventListener("click", () => { state.limite += PAGE; rendre(true); });
+
+const selTheme = $("#themeFiltre");
+[...new Set(VOCABULAIRE.map((m) => m.theme).filter(Boolean))].forEach((t) => selTheme.add(new Option(t, t)));
+selTheme.addEventListener("change", () => { state.theme = selTheme.value; rendre(); });
+$("#tri").addEventListener("change", (e) => { state.tri = e.target.value; rendre(); });
+
+document.querySelectorAll("[data-filter]").forEach((b) =>
+  b.addEventListener("click", () => {
+    state.filtre = b.dataset.filter;
+    document.querySelectorAll("[data-filter]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    rendre();
+  })
+);
+
+const sel = $("#reciter");
+sel.innerHTML = RECITATEURS.map((r, i) => `<option value="${i}">${esc(r.nom)}</option>`).join("");
+if (!RECITATEURS[state.recitateur]) state.recitateur = 0;
+sel.value = state.recitateur;
+sel.addEventListener("change", () => { state.recitateur = Number(sel.value); store.set("vc-recitateur", state.recitateur); rendre(true); rendreDuas(); rendreSavoir(); });
+
+/* ---------- Invocations ---------- */
+const etatDuas = { theme: "", recherche: "" };
+const THEMES_DUAS = [...new Set(INVOCATIONS.map((d) => d.theme))];
+const urlsDua = (d) => d.coran.versets.map((n) => urlVerset({ numSourate: d.coran.sourate, numVerset: n }));
+
+function carteDua(d) {
+  const urls = d.coran ? urlsDua(d) : null;
+  return `
+  <article class="card dua rounded-2xl p-5 flex flex-col gap-4 min-w-0" data-dua="${d.id}">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <p class="theme-tag">${esc(d.theme)}</p>
+        <h2 class="dua-titre mt-1">${esc(d.titre)}</h2>
+      </div>
+      ${urls ? boutonAudio("dua", urls[0], "Écouter la récitation " + d.coran.sourate + ":" + d.coran.versets.join("-")) : ""}
+    </div>
+    ${d.repetition ? `<p><span class="rep rounded-full px-3 py-1">${esc(d.repetition)}</span></p>` : ""}
+    <p class="dua-ar" lang="ar">${d.coran ? `<span class="orn">﴿</span> ${esc(d.arabe)} <span class="orn">﴾</span>` : esc(d.arabe)}</p>
+    <p class="dua-phon">${esc(d.phonetique)}</p>
+    <div class="sig rounded-2xl">
+      <h3>Signification :</h3>
+      <p>« ${esc(d.francais)} »</p>
+    </div>
+    ${d.note ? `<p class="dua-note">${esc(d.note)}</p>` : ""}
+    <p class="dua-src mt-auto">📖 ${esc(d.source)}</p>
+  </article>`;
+}
+
+function rendreDuas() {
+  stopTout();
+  const q = norm(etatDuas.recherche.trim());
+  const liste = INVOCATIONS.filter((d) =>
+    (!etatDuas.theme || d.theme === etatDuas.theme) &&
+    (!q || norm([d.titre, d.theme, d.arabe, d.phonetique, d.francais, d.source, d.note || ""].join(" ")).includes(q)));
+  $("#gridDuas").innerHTML = liste.map(carteDua).join("");
+  $("#emptyDuas").hidden = liste.length > 0;
+}
+
+$("#themesDuas").innerHTML = ["", ...THEMES_DUAS].map((t) =>
+  `<button class="chip rounded-full px-3 py-1.5 text-sm" type="button" data-theme-dua="${esc(t)}" aria-pressed="${t === ""}">${t ? esc(t) : "Toutes"} <span class="num opacity-70">${t ? INVOCATIONS.filter((d) => d.theme === t).length : INVOCATIONS.length}</span></button>`).join("");
+$("#themesDuas").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-theme-dua]");
+  if (!b) return;
+  etatDuas.theme = b.dataset.themeDua;
+  document.querySelectorAll("[data-theme-dua]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  rendreDuas();
+});
+$("#searchDuas").addEventListener("input", (e) => { etatDuas.recherche = e.target.value; rendreDuas(); });
+$("#gridDuas").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-audio]");
+  if (!btn) return;
+  const d = INVOCATIONS.find((x) => x.id === btn.closest("[data-dua]").dataset.dua);
+  jouer(btn, { url: urlsDua(d), texte: d.arabe });
+});
+
+/* ---------- Savoir ---------- */
+const urlsCoran = (c) => c.versets.map((n) => urlVerset({ numSourate: c.sourate, numVerset: n }));
+
+function carteSavoir(f) {
+  return `
+  <article class="card rounded-2xl p-5 flex flex-col gap-3 min-w-0" data-fiche="${f.id}">
+    <h2 class="dua-titre">${esc(f.titre)}</h2>
+    <div class="sig rounded-2xl" style="padding:16px 18px;min-height:0"><p>${esc(f.intro)}</p></div>
+    <ol>${f.items.map((it, i) => `
+      <li class="fiche-item">
+        <span class="fiche-n num">${i + 1}</span>
+        <div class="min-w-0">
+          <p class="fiche-nom"><span class="ar" lang="ar">${esc(it.arabe)}</span><span class="ph">${esc(it.phonetique)}</span></p>
+          <p>${esc(it.role)}</p>
+          <p class="fiche-preuve">📖 ${esc(it.preuve)}</p>
+          ${it.correction ? `<p class="fiche-corr">⚠️ ${esc(it.correction)}</p>` : ""}
+        </div>
+        <span data-item="${i}">${it.coran ? boutonAudio("savoir", urlsCoran(it.coran)[0], "Écouter le verset " + it.coran.sourate + ":" + it.coran.versets.join("-"), "small") : ""}</span>
+      </li>`).join("")}
+    </ol>
+  </article>`;
+}
+
+function rendreSavoir() {
+  $("#gridSavoir").innerHTML = SAVOIR.map(carteSavoir).join("");
+}
+
+$("#gridSavoir").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-audio]");
+  if (!btn) return;
+  const f = SAVOIR.find((x) => x.id === btn.closest("[data-fiche]").dataset.fiche);
+  const it = f.items[Number(btn.closest("[data-item]").dataset.item)];
+  jouer(btn, { url: urlsCoran(it.coran), texte: it.arabe });
+});
+
+/* ---------- Onglets ---------- */
+function afficherVue(vue) {
+  stopTout();
+  document.querySelectorAll("[data-vue]").forEach((t) => t.setAttribute("aria-selected", t.dataset.vue === vue));
+  $("#vueMots").hidden = vue !== "mots";
+  $("#vueDuas").hidden = vue !== "duas";
+  $("#vueSavoir").hidden = vue !== "savoir";
+  store.set("vc-vue", vue);
+}
+document.querySelectorAll("[data-vue]").forEach((t) => t.addEventListener("click", () => { afficherVue(t.dataset.vue); window.scrollTo(0, 0); }));
+
+/* ---------- Thème clair / sombre ---------- */
+const root = document.documentElement;
+const themeSauve = store.get("vc-theme", null);
+if (themeSauve) root.dataset.theme = themeSauve;
+const estSombre = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+const majBoutonTheme = () => ($("#themeBtn").textContent = estSombre() ? "☀ Mode clair" : "☾ Mode sombre");
+$("#themeBtn").addEventListener("click", () => {
+  root.dataset.theme = estSombre() ? "light" : "dark";
+  store.set("vc-theme", root.dataset.theme);
+  majBoutonTheme();
+});
+majBoutonTheme();
+
+if ("speechSynthesis" in window) speechSynthesis.getVoices(); // précharge la liste des voix
+$("#noteLien").hidden = !MODE_LIEN;
+rendre();
+rendreDuas();
+rendreSavoir();
+const VUES = ["mots", "duas", "savoir"];
+afficherVue(location.hash === "#invocations" ? "duas" : location.hash === "#savoir" ? "savoir" : VUES.includes(store.get("vc-vue", "mots")) ? store.get("vc-vue", "mots") : "mots");
+</script>
+</body>
+</html>
