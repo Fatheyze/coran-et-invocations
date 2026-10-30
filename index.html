@@ -1803,12 +1803,12 @@ function stopTout() {
 }
 
 function parler(texte, btn) {
-  if (!("speechSynthesis" in window)) { toast("La synthèse vocale n'est pas disponible dans ce navigateur."); marquer(btn, false); return; }
-  const u = new SpeechSynthesisUtterance(texte);
-  u.lang = "ar-SA"; u.rate = 0.75;
+  const arrete = () => { marquer(btn, false); if (boutonActif === btn) boutonActif = null; };
+  if (!("speechSynthesis" in window)) { toast("La synthèse vocale n'est pas disponible dans ce navigateur."); arrete(); return; }
   const voix = speechSynthesis.getVoices().find((v) => v.lang && v.lang.toLowerCase().startsWith("ar"));
-  if (voix) u.voice = voix;
-  else toast("Aucune voix arabe installée : la prononciation peut être approximative.");
+  if (!voix) { toast("Aucune voix arabe n'est installée sur cet appareil : le texte ne peut pas être lu à voix haute."); arrete(); return; }
+  const u = new SpeechSynthesisUtterance(texte);
+  u.lang = "ar-SA"; u.rate = 0.75; u.voice = voix;
   u.onend = u.onerror = () => { if (boutonActif === btn) { marquer(btn, false); boutonActif = null; } };
   speechSynthesis.speak(u);
 }
@@ -2075,7 +2075,7 @@ function carteDua(d) {
         <p class="theme-tag">${esc(d.theme)}</p>
         <h2 class="dua-titre mt-1">${esc(d.titre)}</h2>
       </div>
-      ${urls ? boutonAudio("dua", urls[0], "Écouter la récitation " + d.coran.sourate + ":" + d.coran.versets.join("-")) : ""}
+      ${urls ? boutonAudio("dua", urls[0], "Écouter la récitation " + d.coran.sourate + ":" + d.coran.versets.join("-")) : boutonAudio("dua", null, "Écouter le texte arabe (voix de synthèse)")}
     </div>
     ${d.repetition ? `<p><span class="rep rounded-full px-3 py-1">${esc(d.repetition)}</span></p>` : ""}
     <p class="dua-ar" lang="ar">${d.coran ? `<span class="orn">﴿</span> ${esc(d.arabe)} <span class="orn">﴾</span>` : esc(d.arabe)}</p>
@@ -2113,7 +2113,7 @@ $("#gridDuas").addEventListener("click", (e) => {
   const btn = e.target.closest("[data-audio]");
   if (!btn) return;
   const d = INVOCATIONS.find((x) => x.id === btn.closest("[data-dua]").dataset.dua);
-  jouer(btn, { url: urlsDua(d), texte: d.arabe });
+  jouer(btn, { url: d.coran ? urlsDua(d) : null, texte: d.arabe });
 });
 
 /* ---------- Savoir ---------- */
