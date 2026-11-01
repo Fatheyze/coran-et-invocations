@@ -1541,7 +1541,7 @@ const INVOCATIONS = [
     source: "Sahîh Muslim 2702 · Sahîh Al-Bukhârî 6307",
     note: "Le Prophète ﷺ se repentait à Allah cent fois par jour." },
 
-  { id: "bismillah", theme: "Protection", titre: "Pour une protection absolue", repetition: "3 fois matin et soir",
+  { id: "bismillah", theme: "Bien commencer sa journée", titre: "Pour une protection absolue", repetition: "3 fois matin et soir",
     arabe: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
     phonetique: "Bismillâhi-lladhî lâ yadurru ma'a-smihi shay'un fi-l-ardi wa lâ fi-s-samâ'i, wa Huwa-s-Samî'u-l-'Alîm.",
     francais: "Au nom d'Allah, avec le nom de qui rien ne peut nuire, ni sur la terre ni dans le ciel, et Il est Celui qui entend tout, qui sait tout.",
@@ -1752,7 +1752,25 @@ const INVOCATIONS = [
     phonetique: "Wa iyyak (à Jazakallahu khayran) · Wa fik barakallah (à Barakallahu fik)",
     francais: "Et toi aussi. Et en toi aussi, qu'Allah te bénisse.",
     source: "Usage courant",
-    note: "À une fille : « wa iyyaki, wa fiki barakallah »." }
+    note: "À une fille : « wa iyyaki, wa fiki barakallah »." },
+  { id: "hamd-reveil", theme: "Bien commencer sa journée", titre: "En se réveillant : louange à Allah qui redonne la vie",
+    arabe: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+    phonetique: "Al-hamdu lillâhi-lladhî ahyânâ ba'da mâ amâtanâ wa ilayhi-n-nushûr.",
+    francais: "Louange à Allah qui nous a redonné la vie après nous avoir fait mourir, et c'est vers Lui que se fera la résurrection.",
+    source: "Sahîh Al-Bukhârî 6312" },
+  { id: "raditu", theme: "Bien commencer sa journée", titre: "Renouveler sa foi : Allah, l'Islam et Muhammad ﷺ",
+    repetition: "3 fois",
+    arabe: "رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ ﷺ نَبِيًّا",
+    phonetique: "Radîtu billâhi Rabban, wa bil-islâmi dînan, wa bi-Muhammadin nabiyyan.",
+    francais: "J'agrée Allah comme Seigneur, l'Islam comme religion et Muhammad comme Prophète.",
+    source: "Sahîh Muslim 34 · Sunan Abî Dâwûd 1529" },
+  { id: "fatiha-ouverture", theme: "Foi et prière", titre: "Invocation avant la Fâtiha",
+    repetition: "3 fois",
+    arabe: "اللَّهُ أَكْبَرُ كَبِيرًا، وَالْحَمْدُ لِلَّهِ كَثِيرًا، وَسُبْحَانَ اللَّهِ بُكْرَةً وَأَصِيلًا",
+    phonetique: "Allâhu akbaru kabîrâ, wal-hamdu lillâhi kathîrâ, wa subhânallâhi bukratan wa asîlâ.",
+    francais: "Allah est le plus grand, d'une grandeur immense ; louange abondante à Allah ; gloire à Allah matin et soir.",
+    source: "Sahîh Muslim (invocation d'ouverture de la prière)",
+    note: "Invocation d'ouverture à réciter avant la sourate Al-Fâtiha, selon la capture. La référence exacte du hadith reste à vérifier." }
 ];
 
 /* Fiches de connaissances générales. « coran » permet d'écouter le verset cité. */
@@ -1816,6 +1834,28 @@ const SAVOIR = [
         preuve: "Défi de la semaine" },
       { arabe: "", phonetique: "", role: "Madârij as-Sâlikîn d'Ibn al-Qayyim ; Majmû' al-Fatâwâ de Cheikh al-Islam Ibn Taymiyya.",
         preuve: "Sources" }
+    ] },
+  { id: "rouqya", titre: "La rouqya contre le mauvais œil et les signes de mal",
+    intro: "Le mauvais œil est une réalité, et le Prophète ﷺ nous a enseigné la rouqya comme remède. Commence par formuler ton intention, puis récite les sourates suivantes. Chaque récitation peut être écoutée avec le bouton ▶.",
+    items: [
+      { arabe: "", phonetique: "", role: "Formule ton intention : « Qu'Allah purifie mon corps de tout effet négatif. »",
+        preuve: "Fiche Arkann, « Que faire lorsque tu reconnais ces signes ? »" },
+      { arabe: "الْفَاتِحَةُ", phonetique: "Al-Fâtiha (×3)", role: "Réciter trois fois.",
+        preuve: "Sourate Al-Fâtiha 1:1-7", coran: { sourate: 1, versets: [1, 2, 3, 4, 5, 6, 7] } },
+      { arabe: "آيَةُ الْكُرْسِيِّ", phonetique: "Âyat al-Kursî (×3)", role: "Réciter trois fois. Elle est aussi à réciter avant de dormir.",
+        preuve: "Sourate Al-Baqara 2:255", coran: { sourate: 2, versets: [255] } },
+      { arabe: "خَوَاتِيمُ سُورَةِ الْبَقَرَةِ", phonetique: "Les deux derniers versets d'Al-Baqara (×3)", role: "Réciter trois fois.",
+        preuve: "Sourate Al-Baqara 2:285-286", coran: { sourate: 2, versets: [285, 286] } },
+      { arabe: "سُورَةُ الْإِخْلَاصِ", phonetique: "Al-Ikhlâs (×3)", role: "Réciter trois fois.",
+        preuve: "Sourate Al-Ikhlâs 112:1-4", coran: { sourate: 112, versets: [1, 2, 3, 4] } },
+      { arabe: "سُورَةُ الْفَلَقِ", phonetique: "Al-Falaq (×3)", role: "Réciter trois fois.",
+        preuve: "Sourate Al-Falaq 113:1-5", coran: { sourate: 113, versets: [1, 2, 3, 4, 5] } },
+      { arabe: "سُورَةُ النَّاسِ", phonetique: "An-Nâs (×3)", role: "Réciter trois fois.",
+        preuve: "Sourate An-Nâs 114:1-6", coran: { sourate: 114, versets: [1, 2, 3, 4, 5, 6] } },
+      { arabe: "", phonetique: "", role: "Souffle dans tes mains, puis passe-les sur tout ton corps.",
+        preuve: "Fiche Arkann, rouqya" },
+      { arabe: "", phonetique: "", role: "Protection quotidienne : récite Âyat al-Kursî avant de dormir, et les trois Qul (Al-Ikhlâs, Al-Falaq, An-Nâs) matin et soir.",
+        preuve: "Fiche Arkann, protection matin et soir" }
     ] }
 ];
 
