@@ -2435,7 +2435,7 @@ function carteOmra(r, ri) {
         <h3 class="font-semibold" style="color: var(--sig)">${esc(e.titre)}</h3>
         ${e.texte ? `<p class="text-sm">${esc(e.texte)}</p>` : ""}
         ${e.invocations.map((v, ki) => `
-          <div class="sig rounded-2xl" style="padding:16px 18px;min-height:0">
+          <div class="rounded-2xl" style="padding:16px 18px;background:var(--surface-2);border:1px solid var(--line)">
             <div class="flex items-start justify-between gap-3">
               <p class="dua-ar flex-1 min-w-0" lang="ar">${esc(v.arabe)}</p>
               <button class="play" type="button" data-audio="omra" data-idx="${ri}-${si}-${ki}" aria-label="Écouter le texte arabe (voix de synthèse)">${ICON_PLAY}</button>
