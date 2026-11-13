@@ -117,6 +117,7 @@
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fiche-nom .ph { color: var(--gold); } }
   .fiche-preuve { font-size: 13px; color: var(--muted); margin-top: 2px; }
   .fiche-preuve .ar { font-size: 19px; }
+  .omra-step { border-top: 1px solid var(--line); padding-top: 16px; }
   .fiche-corr { font-size: 13px; margin-top: 6px; padding: 6px 10px; border-radius: 10px; background: var(--gold-soft); color: var(--ink); }
   :root[data-theme="dark"] .dua-src { color: var(--gold); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dua-src { color: var(--gold); } }
@@ -220,6 +221,7 @@
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="mots" aria-selected="true"><span class="ic" aria-hidden="true">📖</span>Vocabulaire</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="duas" aria-selected="false"><span class="ic" aria-hidden="true">🤲</span>Invocations</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="savoir" aria-selected="false"><span class="ic" aria-hidden="true">💡</span>Savoir</button>
+    <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="omra" aria-selected="false"><span class="ic" aria-hidden="true">🕋</span>Omra</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="recherche" aria-selected="false"><span class="ic" aria-hidden="true">🔎</span>Recherche</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="revision" aria-selected="false"><span class="ic" aria-hidden="true">🔁</span>Révision</button>
   </div>
@@ -294,6 +296,14 @@
 <main class="gutter mx-auto max-w-6xl" style="padding-block: 24px 48px;">
   <p class="muted max-w-3xl mb-6">Des fiches pour mieux connaître sa religion, avec les noms en arabe, leur phonétique et la preuve dans le Coran ou la Sunna.</p>
   <div id="gridSavoir" class="grid gap-6"></div>
+</main>
+</div>
+
+<div id="vueOmra" hidden>
+<main class="gutter mx-auto max-w-6xl" style="padding-block: 24px 48px;">
+  <p class="muted max-w-3xl mb-4">Le concis des rites de la Omra (petit pèlerinage) : les étapes dans l'ordre, avec les invocations en arabe, en phonétique et en français. Tiré du livret d'Omra Du Savoir, qui reprend les invocations du cheikh Nâsir ad-Dîn al-Albânî (qu'Allah lui fasse miséricorde). Le bouton ▶ lit le texte arabe à voix haute.</p>
+  <div id="sommaireOmra" class="flex flex-wrap gap-2 mb-6" role="group" aria-label="Rites de la Omra"></div>
+  <div id="gridOmra" class="grid gap-6"></div>
 </main>
 </div>
 
@@ -1914,6 +1924,84 @@ const SAVOIR = [
     ] }
 ];
 
+/* Omra : rites dans l'ordre, d'après le livret « Le concis des rites de la Omra » (Omra Du Savoir). */
+const OMRA = [
+  { id: "ihram", court: "1) Al-Ihram", titre: "Al-Ihram : l'entrée en état de sacralisation",
+    intro: "Avant d'entrer en état de sacralisation, il est recommandé de faire deux unités de prière (ceci est spécifique au Miqat de Médine).",
+    etapes: [
+      { titre: "a) L'entrée en état de sacralisation", texte: "Formule à prononcer au moment de l'entrée en état de sacralisation :",
+        invocations: [
+          { arabe: "لَبَّيْكَ اللَّهُمَّ بِعُمْرَةٍ", phonetique: "Labbayka Allâhumma bi-'umra", francais: "Je réponds à ton appel, Ô Allah, par une 'Umra." },
+          { arabe: "اللَّهُمَّ هَذِهِ عُمْرَةٌ لَا رِيَاءَ فِيهَا وَلَا سُمْعَةَ", phonetique: "Allâhumma hâdhihi 'umratun lâ riyâ'a fîhâ wa lâ sum'a",
+            francais: "Ô Allah, ceci est un pèlerinage sans ostentation et sans chercher la bonne réputation.", note: "Formule facultative, qu'on peut ajouter à la précédente." },
+          { arabe: "اللَّهُمَّ مَحِلِّي حَيْثُ حَبَسْتَنِي", phonetique: "Allâhumma mahillî haythu habastanî",
+            francais: "Mon Seigneur, je me désacraliserai là où Tu m'arrêteras.", note: "Pour celui qui craint qu'un empêchement ne le pousse à interrompre sa Omra." }
+        ] },
+      { titre: "b) La Talbiya", texte: "À prononcer le long de la route jusqu'à La Mecque, à voix haute.",
+        invocations: [
+          { arabe: "لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ، إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ",
+            phonetique: "Labbayka Allâhumma labbayk, labbayka lâ charîka laka labbayk, inna-l-hamda wa-n-ni'mata laka wa-l-mulk, lâ charîka lak",
+            francais: "Je réponds à Ton appel, Ô Allah, je réponds à Ton appel. Tu n'as point d'associé, je réponds à Ton appel. La louange, le bienfait et la royauté T'appartiennent. Tu n'as point d'associé." },
+          { arabe: "لَا إِلَٰهَ إِلَّا اللَّهُ", phonetique: "Lâ ilâha illa-Llâh", francais: "Nul n'est digne d'adoration si ce n'est Allah.", note: "On peut la dire de temps en temps." }
+        ] },
+      { titre: "c) L'entrée à la mosquée", texte: "Rentrer par le pied droit et dire :",
+        invocations: [
+          { arabe: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَسَلِّمْ، اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ", phonetique: "Allâhumma salli 'alâ Muhammadin wa sallim, Allâhumma iftah lî abwâba rahmatik",
+            francais: "Ô Allah, prie et salue sur Mohammad. Ô Allah, ouvre-moi les portes de Ta miséricorde." }
+        ] },
+      { titre: "d) Lorsqu'on voit la Ka'ba", texte: "",
+        invocations: [
+          { arabe: "اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، فَحَيِّنَا رَبَّنَا بِالسَّلَامِ", phonetique: "Allâhumma anta-s-salâm, wa minka-s-salâm, fa hayyinâ rabbanâ bi-s-salâm",
+            francais: "Ô Allah, Tu es la Paix, et de Toi vient la Paix. Garde-nous, Ô Seigneur, dans la Paix." },
+          { arabe: "أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ", phonetique: "A'ûdhu billâhi-l-'azîm, wa bi-wajhihi-l-karîm, wa sultânihi-l-qadîm, mina-sh-shaytâni-r-rajîm",
+            francais: "Je me mets sous la protection d'Allah le Très Grand, auprès de Son Visage noble et de Sa Souveraineté éternelle, contre Satan le lapidé." }
+        ] }
+    ] },
+  { id: "tawaf", court: "2) At-Tawaf", titre: "At-Tawaf : faire sept tours",
+    intro: "Faire sept tours autour de la Ka'ba, en découvrant l'épaule droite.",
+    etapes: [
+      { titre: "Au départ, face à la Pierre noire", texte: "Se diriger vers la Pierre noire, se mettre en face d'elle et dire :",
+        invocations: [
+          { arabe: "بِسْمِ اللَّهِ، اللَّهُ أَكْبَرُ", phonetique: "Bismi-Llâh, Allâhu akbar", francais: "Au nom d'Allah, Allah est le plus grand." }
+        ] },
+      { titre: "Toucher la Pierre noire", texte: "Toucher la Pierre noire de la main, l'embrasser et y poser le front. Si ce n'est pas possible, la toucher de la main puis embrasser sa main. Si ce n'est pas possible non plus, faire signe de la main en direction de la Pierre noire. Toucher le coin yéménite à chaque tour, si possible.",
+        invocations: [] },
+      { titre: "Entre le coin yéménite et la Pierre noire", texte: "À répéter à chaque tour, lorsqu'on marche entre le coin yéménite et la Pierre noire :",
+        invocations: [
+          { arabe: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ", phonetique: "Rabbanâ âtinâ fî-d-dunyâ hasanatan wa fî-l-âkhirati hasanatan wa qinâ 'adhâba-n-nâr",
+            francais: "Ô Seigneur, accorde-nous une bonne situation dans la vie d'ici-bas ainsi que dans l'au-delà, et préserve-nous du châtiment du Feu." }
+        ] },
+      { titre: "Après le septième tour", texte: "Se couvrir l'épaule, puis se diriger vers le Maqam Ibrahim en récitant :",
+        invocations: [
+          { arabe: "وَاتَّخِذُوا مِنْ مَقَامِ إِبْرَاهِيمَ مُصَلًّى", phonetique: "Wa-ttakhidhû min maqâmi Ibrâhîma musallâ",
+            francais: "Adoptez donc comme lieu de prière cet endroit où Ibrahim se tint debout…" }
+        ] },
+      { titre: "Deux unités de prière", texte: "Accomplir deux unités de prière : dans la première, la sourate Al-Kâfirûn ; dans la seconde, la sourate Al-Ikhlâs. Ensuite, boire de l'eau de Zem-Zem, s'en verser sur la tête, puis se diriger vers le mont Safa.",
+        invocations: [] }
+    ] },
+  { id: "saï", court: "3) As-Sa'y", titre: "As-Sa'y : les allers-retours entre Safa et Marwa",
+    intro: "Sept trajets entre le mont Safa et le mont Marwa, le dernier se terminant sur Marwa.",
+    etapes: [
+      { titre: "En bas du mont Safa", texte: "En arrivant au bas du mont Safa, réciter :",
+        invocations: [
+          { arabe: "إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ، فَمَنْ حَجَّ الْبَيْتَ أَوِ اعْتَمَرَ فَلَا جُنَاحَ عَلَيْهِ أَنْ يَطَّوَّفَ بِهِمَا، وَمَنْ تَطَوَّعَ خَيْرًا فَإِنَّ اللَّهَ شَاكِرٌ عَلِيمٌ",
+            phonetique: "Inna-s-Safâ wa-l-Marwata min sha'â'iri Allâh, fa-man hajja-l-bayta awi'tamara fa lâ junâha 'alayhi an yattawwafa bihimâ, wa man tatawwa'a khayran fa inna Allâha shâkirun 'alîm",
+            francais: "As-Safa et Al-Marwa sont vraiment parmi les lieux sacrés d'Allah. Quiconque fait le pèlerinage à la Maison (sacrée) ou fait la Omra ne commet pas de péché en faisant le va-et-vient entre ces deux monts. Et quiconque fait de son propre gré une bonne œuvre, alors Allah est Reconnaissant, Omniscient." }
+        ] },
+      { titre: "Sur le mont Safa, face à la Ka'ba", texte: "On lève les mains et on dit la formule suivante, trois fois de suite, en faisant des invocations entre chaque fois. Puis on dit :",
+        invocations: [
+          { arabe: "اللهُ أَكْبَرُ، اللهُ أَكْبَرُ، اللهُ أَكْبَرُ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ، أَنْجَزَ وَعْدَهُ، وَنَصَرَ عَبْدَهُ، وَهَزَمَ الْأَحْزَابَ وَحْدَهُ",
+            phonetique: "Allâhu akbar (×3), lâ ilâha illa-Llâhu wahdahu lâ charîka lahu, lahu-l-mulku wa lahu-l-hamdu, yuhyî wa yumît, wa huwa 'alâ kulli shay'in qadîr. Lâ ilâha illa-Llâhu wahdahu, anjaza wa'dahu, wa nasara 'abdahu, wa hazama-l-ahzâba wahdahu",
+            francais: "Allah est le Plus Grand (×3). Il n'y a pas de divinité autre qu'Allah, Seul, sans associé. À Lui appartiennent la souveraineté et la louange. Il donne la vie et donne la mort, et Il est capable de toutes choses. Il a réalisé Sa promesse, donné la victoire à Son esclave et vaincu toutes les factions Seul." },
+          { arabe: "نَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ", phonetique: "Nabda'u bimâ bada'a Allâhu bihi", francais: "Nous commençons par ce qu'Allah a cité en premier." }
+        ] },
+      { titre: "Entre Safa et Marwa", texte: "Descendre de Safa vers Marwa en marchant et en faisant des invocations. Arrivé au premier repère (une lumière verte), on court (les hommes uniquement, selon l'usage) jusqu'au deuxième repère, puis on reprend une marche normale jusqu'à Marwa. Sur Marwa, on fait ce qu'on a fait sur Safa, en se tournant vers la Ka'ba. Ainsi se termine le premier trajet.",
+        invocations: [] },
+      { titre: "Fin des sept trajets", texte: "Le pèlerin fait sept trajets, le dernier se terminant sur Marwa. Une fois le septième achevé, il se rase les cheveux ou les raccourcit. La Omra est alors accomplie et le pèlerin peut se désacraliser.",
+        invocations: [] }
+    ] }
+];
+
 /* Récitateurs disponibles (fichiers mp3 verset par verset sur everyayah.com). */
 const RECITATEURS = [
   { nom: "Abdul Rahman Al-Sudais", base: "https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/" },
@@ -2333,9 +2421,54 @@ $("#gridSavoir").addEventListener("click", (e) => {
   jouer(btn, { url: urlsCoran(it.coran), texte: it.arabe });
 });
 
+/* ---------- Omra ---------- */
+function carteOmra(r, ri) {
+  return `
+  <article class="card rounded-2xl p-5 flex flex-col gap-5 min-w-0" data-fiche="${r.id}">
+    <div class="min-w-0">
+      <p class="theme-tag">Rite ${ri + 1} sur ${OMRA.length}</p>
+      <h2 class="dua-titre mt-1">${esc(r.titre)}</h2>
+      <p class="muted text-sm mt-2">${esc(r.intro)}</p>
+    </div>
+    ${r.etapes.map((e, si) => `
+      <section class="omra-step flex flex-col gap-3 min-w-0">
+        <h3 class="font-semibold" style="color: var(--sig)">${esc(e.titre)}</h3>
+        ${e.texte ? `<p class="text-sm">${esc(e.texte)}</p>` : ""}
+        ${e.invocations.map((v, ki) => `
+          <div class="sig rounded-2xl" style="padding:16px 18px;min-height:0">
+            <div class="flex items-start justify-between gap-3">
+              <p class="dua-ar flex-1 min-w-0" lang="ar">${esc(v.arabe)}</p>
+              <button class="play" type="button" data-audio="omra" data-idx="${ri}-${si}-${ki}" aria-label="Écouter le texte arabe (voix de synthèse)">${ICON_PLAY}</button>
+            </div>
+            <p class="dua-phon">${esc(v.phonetique)}</p>
+            <p>« ${esc(v.francais)} »</p>
+            ${v.note ? `<p class="dua-note mt-2">${esc(v.note)}</p>` : ""}
+          </div>`).join("")}
+      </section>`).join("")}
+  </article>`;
+}
+
+function rendreOmra() {
+  $("#sommaireOmra").innerHTML = OMRA.map((r) => `<button class="chip rounded-full px-3 py-1.5 text-sm" type="button" data-omra="${r.id}">${esc(r.court)}</button>`).join("");
+  $("#gridOmra").innerHTML = OMRA.map(carteOmra).join("");
+}
+
+$("#sommaireOmra").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-omra]");
+  if (!b) return;
+  document.querySelector(`#gridOmra [data-fiche="${b.dataset.omra}"]`)?.scrollIntoView({ block: "start" });
+});
+
+$("#gridOmra").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-audio]");
+  if (!btn) return;
+  const [r, s, k] = btn.dataset.idx.split("-").map(Number);
+  jouer(btn, { url: null, texte: OMRA[r].etapes[s].invocations[k].arabe });
+});
+
 /* ---------- Recherche globale ---------- */
 const etatRecherche = { texte: "" };
-const LIBELLES_RECHERCHE = { mots: "Vocabulaire", duas: "Invocations", savoir: "Savoir" };
+const LIBELLES_RECHERCHE = { mots: "Vocabulaire", duas: "Invocations", savoir: "Savoir", omra: "Omra" };
 const coupe = (s, n = 140) => (s && s.length > n ? s.slice(0, n).trimEnd() + "…" : s || "");
 
 /* Cherche dans les mots, les invocations et les fiches. Les accents, voyelles (tashkil) et apostrophes sont ignorés. */
@@ -2359,6 +2492,10 @@ function resultatsRecherche(q) {
   for (const f of SAVOIR) {
     const texte = [f.titre, f.intro, ...f.items.map((it) => [it.arabe, it.phonetique, it.role, it.preuve, it.correction || ""].join(" "))].join(" ");
     if (norm(texte).includes(q)) res.push({ cat: "savoir", titre: f.titre, texte: f.intro, go: "savoir", fiche: f.id });
+  }
+  for (const r of OMRA) {
+    const texte = [r.titre, r.intro, ...r.etapes.map((e) => [e.titre, e.texte || "", ...e.invocations.map((v) => [v.arabe, v.phonetique, v.francais, v.note || ""].join(" "))].join(" "))].join(" ");
+    if (norm(texte).includes(q)) res.push({ cat: "omra", titre: r.titre, texte: r.intro, go: "omra", fiche: r.id });
   }
   return res;
 }
@@ -2519,6 +2656,7 @@ function afficherVue(vue) {
   $("#vueMots").hidden = vue !== "mots";
   $("#vueDuas").hidden = vue !== "duas";
   $("#vueSavoir").hidden = vue !== "savoir";
+  $("#vueOmra").hidden = vue !== "omra";
   $("#vueRecherche").hidden = vue !== "recherche";
   $("#vueRevision").hidden = vue !== "revision";
   if (vue === "revision") rendreRevision();
@@ -2544,9 +2682,10 @@ $("#noteLien").hidden = !MODE_LIEN;
 rendre();
 rendreDuas();
 rendreSavoir();
+rendreOmra();
 rendreRecherche();
 synchroniserRevision();
-const VUES = ["mots", "duas", "savoir", "recherche", "revision"];
+const VUES = ["mots", "duas", "savoir", "omra", "recherche", "revision"];
 afficherVue(location.hash === "#invocations" ? "duas" : location.hash === "#savoir" ? "savoir" : VUES.includes(store.get("vc-vue", "mots")) ? store.get("vc-vue", "mots") : "mots");
 </script>
 </body>
