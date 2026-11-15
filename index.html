@@ -198,7 +198,7 @@
   /* Les 99 noms d'Allah : cadran nocturne, toujours sombre quel que soit le thème. */
   .nm-wrap { background: radial-gradient(circle at 50% 36%, #16274f 0%, #070f24 62%, #040a1a 100%); color: #f4efe2; border-radius: 28px; padding: 26px 14px 24px; text-align: center; border: 1px solid color-mix(in srgb, #d9b45a 28%, transparent); }
   .nm-eyebrow { font-family: var(--font-display); color: #d9b45a; letter-spacing: .3em; text-transform: uppercase; font-size: 12px; }
-  .nm-dial { position: relative; width: min(86vw, 400px); aspect-ratio: 1; margin: 8px auto 0; }
+  .nm-dial { position: relative; width: 100%; max-width: 400px; aspect-ratio: 1; margin: 8px auto 0; }
   .nm-svg { width: 100%; height: 100%; display: block; touch-action: none; cursor: pointer; overflow: visible; outline: none; }
   .nm-svg:focus-visible { outline: 2px solid #d9b45a; outline-offset: 6px; border-radius: 50%; }
   .nm-ring { fill: none; stroke: #d9b45a; stroke-opacity: .16; stroke-width: 1; }
@@ -370,13 +370,13 @@
   <section class="nm-wrap" aria-label="Les 99 noms d'Allah">
     <p class="nm-eyebrow">Les 99 noms d'Allah</p>
     <div class="nm-dial">
-      <svg id="nmSvg" class="nm-svg" viewBox="0 0 400 400" role="slider" tabindex="0" aria-label="Choisir un nom d'Allah" aria-valuemin="1" aria-valuemax="99" aria-valuenow="1"></svg>
+      <svg id="nmSvg" class="nm-svg" viewBox="0 0 400 400" role="slider" tabindex="0" aria-label="Choisir un nom d'Allah" aria-valuemin="0" aria-valuemax="98" aria-valuenow="0"></svg>
       <div class="nm-centre"><div id="nmAr" class="nm-ar" lang="ar"></div></div>
     </div>
     <h2 id="nmTr" class="nm-tr"></h2>
     <p id="nmFr" class="nm-fr"></p>
     <p id="nmFam" class="nm-fam"></p>
-    <p class="nm-num"><span id="nmNum">01</span> <b>/ 99</b></p>
+    <p class="nm-num"><span id="nmNum">—</span> <b>/ <span id="nmTot">98</span></b></p>
     <div class="nm-ctrl">
       <button id="nmPrev" class="nm-btn" type="button" aria-label="Nom précédent">⏮</button>
       <button id="nmPlay" class="nm-btn nm-play" type="button" aria-label="Lecture">▶</button>
@@ -2903,17 +2903,19 @@ function nmMaj() {
   $("#nmTr").textContent = tr;
   $("#nmFr").textContent = fr;
   $("#nmFam").textContent = fam;
-  $("#nmNum").textContent = String(nmIdx + 1).padStart(2, "0");
+  const N = NOMS.length - 1;
+  $("#nmNum").textContent = nmIdx === 0 ? "—" : String(nmIdx).padStart(2, "0");
+  $("#nmTot").textContent = String(N);
   const svg = $("#nmSvg");
-  svg.setAttribute("aria-valuenow", nmIdx + 1);
+  svg.setAttribute("aria-valuenow", nmIdx);
   svg.setAttribute("aria-valuetext", `${tr} : ${fr}`);
   document.querySelectorAll(".nm-txt").forEach((t) => {
     const i = Number(t.dataset.i);
     t.classList.toggle("on", i <= nmIdx);
     t.classList.toggle("cur", i === nmIdx);
   });
-  $(".nm-cur").style.transform = `rotate(${nmIdx * (360 / NOMS.length)}deg)`;
-  $(".nm-prog").style.strokeDasharray = `${nmIdx + 1} ${NOMS.length}`;
+  $(".nm-cur").style.transform = `rotate(${nmIdx > 0 ? (nmIdx - 1) * (360 / N) : 0}deg)`;
+  $(".nm-prog").style.strokeDasharray = `${nmIdx} ${N}`;
 }
 
 function nmConstruire() {
@@ -2925,19 +2927,20 @@ function nmConstruire() {
     if (cls) e.setAttribute("class", cls);
     return e;
   };
-  const pas = 360 / NOMS.length;
+  const N = NOMS.length - 1; // 98 noms sur l'anneau ; Allah (idx 0) n'y figure pas
+  const pas = 360 / N;
   svg.appendChild(el("circle", { cx: 200, cy: 200, r: 150 }, "nm-ring"));
   svg.appendChild(el("circle", { cx: 200, cy: 200, r: 118 }, "nm-ring"));
   svg.appendChild(el("circle", { cx: 200, cy: 200, r: 86 }, "nm-ring"));
   svg.appendChild(el("circle", { cx: 200, cy: 200, r: 186 }, "nm-ring"));
-  for (let i = 0; i < NOMS.length; i++) {
-    const rot = `rotate(${i * pas} 200 200)`;
+  for (let i = 1; i <= N; i++) {
+    const rot = `rotate(${(i - 1) * pas} 200 200)`;
     svg.appendChild(el("line", { x1: 200, y1: 12, x2: 200, y2: 21, transform: rot }, "nm-tick"));
     const t = el("text", { x: 200, y: 42, "text-anchor": "middle", transform: rot, "data-i": i }, "nm-txt");
     t.textContent = NOMS[i][0];
     svg.appendChild(t);
   }
-  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 188, pathLength: NOMS.length, transform: "rotate(-90 200 200)" }, "nm-prog"));
+  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 188, pathLength: N, transform: "rotate(-90 200 200)" }, "nm-prog"));
   const cur = el("g", {}, "nm-cur");
   cur.appendChild(el("line", { x1: 200, y1: 24, x2: 200, y2: 56 }, "nm-stick"));
   cur.appendChild(el("circle", { cx: 200, cy: 12, r: 7 }, "nm-dot"));
@@ -2949,7 +2952,7 @@ function nmConstruire() {
     const y = e.clientY - r.top - r.height / 2;
     let a = Math.atan2(y, x) * 180 / Math.PI + 90;
     if (a < 0) a += 360;
-    return Math.round(a / pas) % NOMS.length;
+    return (Math.round(a / pas) % N) + 1;
   };
   let glisse = false;
   svg.addEventListener("pointerdown", (e) => {
