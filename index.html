@@ -370,13 +370,13 @@
   <section class="nm-wrap" aria-label="Les 99 noms d'Allah">
     <p class="nm-eyebrow">Les 99 noms d'Allah</p>
     <div class="nm-dial">
-      <svg id="nmSvg" class="nm-svg" viewBox="0 0 400 400" role="slider" tabindex="0" aria-label="Choisir un nom d'Allah" aria-valuemin="0" aria-valuemax="98" aria-valuenow="0"></svg>
+      <svg id="nmSvg" class="nm-svg" viewBox="0 0 400 400" role="slider" tabindex="0" aria-label="Choisir un nom d'Allah" aria-valuemin="0" aria-valuemax="99" aria-valuenow="0"></svg>
       <div class="nm-centre"><div id="nmAr" class="nm-ar" lang="ar"></div></div>
     </div>
     <h2 id="nmTr" class="nm-tr"></h2>
     <p id="nmFr" class="nm-fr"></p>
     <p id="nmFam" class="nm-fam"></p>
-    <p class="nm-num"><span id="nmNum">—</span> <b>/ <span id="nmTot">98</span></b></p>
+    <p class="nm-num"><span id="nmNum">—</span> <b>/ <span id="nmTot">99</span></b></p>
     <div class="nm-ctrl">
       <button id="nmPrev" class="nm-btn" type="button" aria-label="Nom précédent">⏮</button>
       <button id="nmPlay" class="nm-btn nm-play" type="button" aria-label="Lecture">▶</button>
@@ -2773,6 +2773,7 @@ const NOMS = [
   ["الْوَاجِدُ", "Al-Wajid", "Le Trouveur", "Création"],
   ["الْمَاجِدُ", "Al-Majid", "Le Noble par excellence", "Noblesse"],
   ["الْوَاحِدُ", "Al-Wahid", "L'Unique", "Unicité"],
+  ["الْأَحَدُ", "Al-Ahad", "L'Unique", "Unicité"],
   ["الصَّمَدُ", "As-Samad", "L'Absolu", "Suffisance"],
   ["الْقَادِرُ", "Al-Qadir", "Le Capable", "Puissance"],
   ["الْمُقْتَدِرُ", "Al-Muqtadir", "Le Tout-Puissant", "Puissance"],
@@ -2813,8 +2814,8 @@ let nmEcoute = false;
 let nmSession = 0;
 
 /* Récitation : fichier MP3 si l'index a une URL dans NOMS_AUDIO, sinon voix du navigateur. */
-// Récitation arabe enregistrée, par index (0 = Allah). Allah n'a pas de fichier : voix du navigateur. Fichier 01 = Ar-Rahman. Fichier 99 non utilisé (à vérifier).
-const NOMS_AUDIO = [null, "audio/noms/01.aac", "audio/noms/02.aac", "audio/noms/03.aac", "audio/noms/04.aac", "audio/noms/05.aac", "audio/noms/06.aac", "audio/noms/07.aac", "audio/noms/08.aac", "audio/noms/09.aac", "audio/noms/10.aac", "audio/noms/11.aac", "audio/noms/12.aac", "audio/noms/13.aac", "audio/noms/14.aac", "audio/noms/15.aac", "audio/noms/16.aac", "audio/noms/17.aac", "audio/noms/18.aac", "audio/noms/19.aac", "audio/noms/20.aac", "audio/noms/21.aac", "audio/noms/22.aac", "audio/noms/23.aac", "audio/noms/24.aac", "audio/noms/25.aac", "audio/noms/26.aac", "audio/noms/27.aac", "audio/noms/28.aac", "audio/noms/29.aac", "audio/noms/30.aac", "audio/noms/31.aac", "audio/noms/32.aac", "audio/noms/33.aac", "audio/noms/34.aac", "audio/noms/35.aac", "audio/noms/36.aac", "audio/noms/37.aac", "audio/noms/38.aac", "audio/noms/39.aac", "audio/noms/40.aac", "audio/noms/41.aac", "audio/noms/42.aac", "audio/noms/43.aac", "audio/noms/44.aac", "audio/noms/45.aac", "audio/noms/46.aac", "audio/noms/47.aac", "audio/noms/48.aac", "audio/noms/49.aac", "audio/noms/50.aac", "audio/noms/51.aac", "audio/noms/52.aac", "audio/noms/53.aac", "audio/noms/54.aac", "audio/noms/55.aac", "audio/noms/56.aac", "audio/noms/57.aac", "audio/noms/58.aac", "audio/noms/59.aac", "audio/noms/60.aac", "audio/noms/61.aac", "audio/noms/62.aac", "audio/noms/63.aac", "audio/noms/64.aac", "audio/noms/65.aac", "audio/noms/66.aac", "audio/noms/67.aac", "audio/noms/68.aac", "audio/noms/69.aac", "audio/noms/70.aac", "audio/noms/71.aac", "audio/noms/72.aac", "audio/noms/73.aac", "audio/noms/74.aac", "audio/noms/75.aac", "audio/noms/76.aac", "audio/noms/77.aac", "audio/noms/78.aac", "audio/noms/79.aac", "audio/noms/80.aac", "audio/noms/81.aac", "audio/noms/82.aac", "audio/noms/83.aac", "audio/noms/84.aac", "audio/noms/85.aac", "audio/noms/86.aac", "audio/noms/87.aac", "audio/noms/88.aac", "audio/noms/89.aac", "audio/noms/90.aac", "audio/noms/91.aac", "audio/noms/92.aac", "audio/noms/93.aac", "audio/noms/94.aac", "audio/noms/95.aac", "audio/noms/96.aac", "audio/noms/97.aac", "audio/noms/98.aac"];
+// Récitation arabe enregistrée, par index (0 = Allah, sans fichier : voix du navigateur). Index k = fichier k (01 = Ar-Rahman, 99 = As-Sabur).
+const NOMS_AUDIO = [null, "audio/noms/01.aac", "audio/noms/02.aac", "audio/noms/03.aac", "audio/noms/04.aac", "audio/noms/05.aac", "audio/noms/06.aac", "audio/noms/07.aac", "audio/noms/08.aac", "audio/noms/09.aac", "audio/noms/10.aac", "audio/noms/11.aac", "audio/noms/12.aac", "audio/noms/13.aac", "audio/noms/14.aac", "audio/noms/15.aac", "audio/noms/16.aac", "audio/noms/17.aac", "audio/noms/18.aac", "audio/noms/19.aac", "audio/noms/20.aac", "audio/noms/21.aac", "audio/noms/22.aac", "audio/noms/23.aac", "audio/noms/24.aac", "audio/noms/25.aac", "audio/noms/26.aac", "audio/noms/27.aac", "audio/noms/28.aac", "audio/noms/29.aac", "audio/noms/30.aac", "audio/noms/31.aac", "audio/noms/32.aac", "audio/noms/33.aac", "audio/noms/34.aac", "audio/noms/35.aac", "audio/noms/36.aac", "audio/noms/37.aac", "audio/noms/38.aac", "audio/noms/39.aac", "audio/noms/40.aac", "audio/noms/41.aac", "audio/noms/42.aac", "audio/noms/43.aac", "audio/noms/44.aac", "audio/noms/45.aac", "audio/noms/46.aac", "audio/noms/47.aac", "audio/noms/48.aac", "audio/noms/49.aac", "audio/noms/50.aac", "audio/noms/51.aac", "audio/noms/52.aac", "audio/noms/53.aac", "audio/noms/54.aac", "audio/noms/55.aac", "audio/noms/56.aac", "audio/noms/57.aac", "audio/noms/58.aac", "audio/noms/59.aac", "audio/noms/60.aac", "audio/noms/61.aac", "audio/noms/62.aac", "audio/noms/63.aac", "audio/noms/64.aac", "audio/noms/65.aac", "audio/noms/66.aac", "audio/noms/67.aac", "audio/noms/68.aac", "audio/noms/69.aac", "audio/noms/70.aac", "audio/noms/71.aac", "audio/noms/72.aac", "audio/noms/73.aac", "audio/noms/74.aac", "audio/noms/75.aac", "audio/noms/76.aac", "audio/noms/77.aac", "audio/noms/78.aac", "audio/noms/79.aac", "audio/noms/80.aac", "audio/noms/81.aac", "audio/noms/82.aac", "audio/noms/83.aac", "audio/noms/84.aac", "audio/noms/85.aac", "audio/noms/86.aac", "audio/noms/87.aac", "audio/noms/88.aac", "audio/noms/89.aac", "audio/noms/90.aac", "audio/noms/91.aac", "audio/noms/92.aac", "audio/noms/93.aac", "audio/noms/94.aac", "audio/noms/95.aac", "audio/noms/96.aac", "audio/noms/97.aac", "audio/noms/98.aac", "audio/noms/99.aac"];
 let nmAudio = null;
 
 function nmStopAudio() {
