@@ -225,6 +225,39 @@
   .nm-vit select { background: transparent; color: #f4efe2; border: 1px solid rgba(217, 180, 90, .5); border-radius: 999px; padding: 10px 14px; font-size: 14px; }
   .nm-vit select option { color: #0f1b33; }
   .nm-note { color: #9ba8c4; font-size: 13px; margin: 18px auto 0; max-width: 44ch; }
+  /* Mémorisation : mode voiture, gros boutons, fond bleu nuit (comme les 99 Noms). */
+  .memo-wrap { background: radial-gradient(circle at 50% 22%, #16274f 0%, #070f24 62%, #040a1a 100%); color: #f4efe2; border-radius: 28px; padding: 22px 16px 24px; border: 1px solid rgba(217, 180, 90, .25); text-align: center; }
+  .memo-eyebrow { font-family: var(--font-display); color: #d9b45a; letter-spacing: .24em; text-transform: uppercase; font-size: 12px; margin: 0; }
+  .memo-select { width: 100%; margin-top: 14px; background: rgba(217, 180, 90, .08); color: #f4efe2; border: 1px solid rgba(217, 180, 90, .5); border-radius: 14px; padding: 12px 14px; font-size: 16px; }
+  .memo-select option { color: #0f1b33; }
+  .memo-note { color: #9ba8c4; font-size: 13px; margin: 10px auto 0; max-width: 46ch; }
+  .memo-link { margin-top: 10px; color: #d9b45a; text-decoration: underline; font-size: 15px; padding: 8px; }
+  .memo-verset { min-height: 200px; display: flex; flex-direction: column; justify-content: center; margin-top: 10px; }
+  .memo-ar { font-family: var(--font-ar); font-size: clamp(34px, 9vw, 52px); line-height: 2; direction: rtl; margin: 0; color: #f4efe2; text-shadow: 0 0 22px rgba(217, 180, 90, .25); }
+  .memo-fr { color: #d9b45a; font-size: clamp(17px, 4.5vw, 21px); font-weight: 700; margin: 10px 0 0; min-height: 2.6em; }
+  .memo-etat { color: #9ba8c4; font-size: 15px; margin: 10px 0 8px; }
+  .memo-barre { height: 6px; background: rgba(217, 180, 90, .15); border-radius: 999px; overflow: hidden; }
+  .memo-barre div { height: 100%; width: 0; background: #d9b45a; transition: width .4s ease; }
+  .memo-ctrl { display: flex; gap: 16px; justify-content: center; align-items: center; margin-top: 20px; }
+  .memo-btn { width: 76px; height: 76px; border-radius: 999px; border: 1px solid rgba(217, 180, 90, .5); background: rgba(217, 180, 90, .08); color: #f4efe2; font-size: 26px; cursor: pointer; }
+  .memo-btn:hover { background: rgba(217, 180, 90, .2); }
+  .memo-btn.memo-play { width: 100px; height: 100px; background: #d9b45a; color: #0e1c3a; border-color: #d9b45a; font-size: 36px; }
+  .memo-btn.memo-play:hover { background: #e8c56f; }
+  .memo-pill { margin-top: 16px; border: 1px solid rgba(217, 180, 90, .5); border-radius: 999px; padding: 10px 18px; color: #f4efe2; background: transparent; font-size: 15px; cursor: pointer; }
+  .memo-reg { margin-top: 22px; text-align: start; border-top: 1px solid rgba(217, 180, 90, .2); padding-top: 14px; }
+  .memo-reg summary { cursor: pointer; color: #d9b45a; font-family: var(--font-display); font-size: 17px; text-align: center; }
+  .memo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; font-size: 13px; }
+  .memo-grid label { display: flex; flex-direction: column; gap: 4px; color: #d9b45a; }
+  .memo-grid input { background: rgba(217, 180, 90, .08); color: #f4efe2; border: 1px solid rgba(217, 180, 90, .4); border-radius: 10px; padding: 8px 10px; font-size: 16px; width: 100%; }
+  .memo-check { display: flex; gap: 10px; align-items: center; margin-top: 14px; font-size: 15px; color: #f4efe2; }
+  .memo-check input { width: 20px; height: 20px; accent-color: #d9b45a; }
+  .memo-liste { margin-top: 26px; border-top: 1px solid rgba(217, 180, 90, .2); padding-top: 14px; max-height: 60vh; overflow-y: auto; }
+  .memo-liste h2 { font-family: var(--font-display); color: #d9b45a; font-size: 18px; font-weight: 400; margin: 0 0 8px; }
+  .memo-v { display: grid; grid-template-columns: 34px 1fr; gap: 4px 10px; width: 100%; text-align: start; padding: 10px 8px; border-radius: 12px; border: 0; background: transparent; color: #f4efe2; cursor: pointer; }
+  .memo-v[aria-current="true"] { background: rgba(217, 180, 90, .18); }
+  .memo-v .memo-num { grid-row: span 2; color: #d9b45a; font-weight: 700; font-size: 14px; padding-top: 6px; }
+  .memo-v .memo-ar2 { font-family: var(--font-ar); direction: rtl; text-align: right; font-size: 24px; line-height: 1.9; }
+  .memo-v .memo-fr2 { color: #9ba8c4; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -255,6 +288,7 @@
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="omra" aria-selected="false"><span class="ic" aria-hidden="true">🕋</span>Omra</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="recherche" aria-selected="false"><span class="ic" aria-hidden="true">🔎</span>Recherche</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="revision" aria-selected="false"><span class="ic" aria-hidden="true">🔁</span>Révision</button>
+    <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="memo" aria-selected="false"><span class="ic" aria-hidden="true">🧠</span>Mémoire</button>
   </div>
 </nav>
 
@@ -386,6 +420,47 @@
       </label>
     </div>
     <p class="nm-note">Faites tourner le curseur, ou touchez un nom de l'anneau pour l'écouter. Chaque nom est prononcé en arabe, puis sa traduction en français.</p>
+  </section>
+</main>
+</div>
+
+<div id="vueMemo" hidden>
+<main class="gutter mx-auto max-w-3xl" style="padding-block: 24px 48px;">
+  <section class="memo-wrap" aria-label="Mémorisation des sourates courtes">
+    <p class="memo-eyebrow">Mémorisation · sourates courtes</p>
+    <label class="block"><span class="sr-only">Sourate</span>
+      <select id="memoSourate" class="memo-select"></select>
+    </label>
+    <p id="memoChargement" class="memo-note" hidden></p>
+    <button id="memoRetry" class="memo-link" type="button" hidden>Réessayer</button>
+    <div class="memo-verset" aria-live="polite">
+      <p id="memoAr" class="memo-ar" lang="ar"></p>
+      <p id="memoFr" class="memo-fr"></p>
+    </div>
+    <p id="memoEtat" class="memo-etat"></p>
+    <div class="memo-barre" role="progressbar" aria-label="Progression de la séance" aria-valuemin="0" aria-valuemax="100"><div id="memoBarreFill"></div></div>
+    <div class="memo-ctrl">
+      <button id="memoPrev" class="memo-btn" type="button" aria-label="Verset précédent">⏮</button>
+      <button id="memoPlay" class="memo-btn memo-play" type="button" aria-label="Lecture">▶</button>
+      <button id="memoNext" class="memo-btn" type="button" aria-label="Verset suivant">⏭</button>
+    </div>
+    <button id="memoRestart" class="memo-pill" type="button">↺ Recommencer la sourate</button>
+    <p id="memoFait" class="memo-note"></p>
+    <details class="memo-reg">
+      <summary>Réglages de la méthode</summary>
+      <div class="memo-grid">
+        <label>Répétitions du verset <input id="memoRV" type="number" min="1" max="30" value="3"></label>
+        <label>Enchaînement 1 → n (×) <input id="memoRC" type="number" min="1" max="30" value="2"></label>
+        <label>Sourate entière (×) <input id="memoRS" type="number" min="1" max="30" value="3"></label>
+        <label>Pause après chaque répétition (s) <input id="memoPause" type="number" min="0" max="30" value="5"></label>
+      </div>
+      <label class="memo-check"><input id="memoTrad" type="checkbox" checked> Lire la traduction française après chaque verset</label>
+      <p class="memo-note">Pendant la pause, répétez à voix haute. Les changements de réglages prennent effet à la prochaine lecture.</p>
+    </details>
+    <div class="memo-liste">
+      <h2>Texte de la sourate</h2>
+      <div id="memoListe"></div>
+    </div>
   </section>
 </main>
 </div>
@@ -3003,7 +3078,10 @@ function afficherVue(vue) {
   $("#vueRecherche").hidden = vue !== "recherche";
   $("#vueRevision").hidden = vue !== "revision";
   $("#vueNoms").hidden = vue !== "noms";
+  $("#vueMemo").hidden = vue !== "memo";
   if (vue !== "noms") nmArreter();
+  if (vue !== "memo") memoPause();
+  if (vue === "memo" && !memo.texte) memoChoisir(Number($("#memoSourate").value));
   if (vue === "revision") rendreRevision();
   store.set("vc-vue", vue);
 }
@@ -3030,7 +3108,275 @@ rendreSavoir();
 rendreOmra();
 rendreRecherche();
 synchroniserRevision();
-const VUES = ["mots", "duas", "savoir", "omra", "recherche", "revision", "noms"];
+/* ---------- Mémorisation : sourates courtes (fin du Coran) ---------- */
+/* [numéro, nom, nombre de versets]. Le texte (arabe vocalisé + traduction) est chargé depuis
+   api.alquran.cloud, avec repli sur api.quran.com, puis gardé dans le navigateur pour un usage hors ligne. */
+const MEMO_SOURATES = [
+  [93, "Ad-Duhâ", 11], [94, "Ach-Charh", 8], [95, "At-Tîn", 8], [96, "Al-‘Alaq", 19],
+  [97, "Al-Qadr", 5], [98, "Al-Bayyina", 8], [99, "Az-Zalzala", 8], [100, "Al-‘Âdiyât", 11],
+  [101, "Al-Qâri‘a", 11], [102, "At-Takâthur", 8], [103, "Al-‘Asr", 3], [104, "Al-Humaza", 9],
+  [105, "Al-Fîl", 5], [106, "Quraych", 4], [107, "Al-Mâ‘ûn", 7], [108, "Al-Kawthar", 3],
+  [109, "Al-Kâfirûn", 6], [110, "An-Nasr", 3], [111, "Al-Masad", 5], [112, "Al-Ikhlâs", 4],
+  [113, "Al-Falaq", 5], [114, "An-Nâs", 6]
+];
+const memoNb = (n) => MEMO_SOURATES.find((s) => s[0] === n)[2];
+const memoNom = (n) => MEMO_SOURATES.find((s) => s[0] === n)[1];
+const memo = { n: 112, texte: null, unites: [], u: 0, p: 0, i: 0, lecture: false, phase: "", fin: null, sess: 0, verrou: null };
+const memoAudio = new Audio();
+memoAudio.preload = "auto";
+memoAudio.onended = () => { const f = memo.fin; memo.fin = null; if (f) f(); };
+memoAudio.onerror = () => { if (!memo.lecture) return; memoPause(); toast("Récitation indisponible. Vérifiez votre connexion Internet."); };
+
+const memoPos = () => store.get("vc-memo-pos", {});
+function memoEnregistrerPos(extra) {
+  const p = memoPos();
+  p[memo.n] = Object.assign({ i: memo.i, fait: 0 }, p[memo.n], extra);
+  store.set("vc-memo-pos", p);
+}
+function memoRegl() {
+  const b = (id, min, max, d) => Math.min(max, Math.max(min, Number($(id).value) || d));
+  return { rv: b("#memoRV", 1, 30, 3), rc: b("#memoRC", 1, 30, 2), rs: b("#memoRS", 1, 30, 3), pause: b("#memoPause", 0, 30, 5), trad: $("#memoTrad").checked };
+}
+
+async function memoCharger(n) {
+  const cle = "vc-memo-texte-" + n;
+  const cache = store.get(cle, null);
+  if (cache && cache.ar && cache.ar.length === memoNb(n)) return cache;
+  let t = null;
+  try {
+    const j = await (await fetch(`https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,fr.hamidullah`)).json();
+    t = { ar: j.data[0].ayahs.map((a) => a.text), fr: j.data[1].ayahs.map((a) => a.text) };
+  } catch {}
+  if (!t || t.ar.length !== memoNb(n)) {
+    try {
+      const j = await (await fetch(`https://api.quran.com/api/v4/verses/by_chapter/${n}?translations=31&fields=text_uthmani&per_page=50`)).json();
+      t = { ar: j.verses.map((v) => v.text_uthmani), fr: j.verses.map((v) => ((v.translations && v.translations[0]) || { text: "" }).text.replace(/<[^>]*>/g, "")) };
+    } catch {}
+  }
+  if (!t || t.ar.length !== memoNb(n)) throw new Error("texte indisponible");
+  store.set(cle, t);
+  return t;
+}
+
+/* Méthode cumulative : chaque verset ×N ; à partir du 2e, enchaînement 1→i ×M ; puis sourate entière ×K.
+   Une « unité » = une suite de sons joués sans pause ; une pause suit chaque unité. */
+function memoConstruire() {
+  const { rv, rc, rs } = memoRegl(), n = memoNb(memo.n), U = [];
+  for (let i = 0; i < n; i++) {
+    for (let r = 1; r <= rv; r++) U.push({ tour: "verset", i, r, R: rv, plays: [i] });
+    if (i > 0) for (let r = 1; r <= rc; r++) U.push({ tour: "chaîne", i, r, R: rc, plays: [...Array(i + 1).keys()] });
+  }
+  const tous = [...Array(n).keys()];
+  for (let r = 1; r <= rs; r++) U.push({ tour: "sourate", i: 0, r, R: rs, plays: tous });
+  return U;
+}
+const memoVersUnit = (i) => Math.max(0, memo.unites.findIndex((U) => U.tour === "verset" && U.i === i && U.r === 1));
+const memoUrl = (i) => RECITATEURS[state.recitateur].base + pad3(memo.n) + pad3(i + 1) + ".mp3";
+function memoPrepare() {
+  memo.unites = memoConstruire();
+  memo.u = memoVersUnit(memo.i); memo.p = 0; memo.phase = "";
+}
+
+/* Pause silencieuse : un WAV de silence joué par l'élément audio, pour que la lecture et les
+   commandes d'écran verrouillé restent actives (les minuteries JavaScript sont suspendues en arrière-plan). */
+const memoSilences = {};
+function memoSilenceUrl(sec) {
+  if (!memoSilences[sec]) {
+    const rate = 8000, n = rate * sec, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    const ecrire = (o, s) => [...s].forEach((c, k) => v.setUint8(o + k, c.charCodeAt(0)));
+    ecrire(0, "RIFF"); v.setUint32(4, 36 + n * 2, true); ecrire(8, "WAVE"); ecrire(12, "fmt ");
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, rate, true);
+    v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    ecrire(36, "data"); v.setUint32(40, n * 2, true);
+    memoSilences[sec] = URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+  }
+  return memoSilences[sec];
+}
+
+function memoLire(url, fin) {
+  memo.fin = fin;
+  memoAudio.src = url;
+  memoAudio.play().catch(() => { if (memo.lecture) { memoPause(); toast("Récitation indisponible. Vérifiez votre connexion Internet."); } });
+}
+function memoSilence(sec, cb) {
+  if (!memo.lecture) return;
+  if (sec <= 0) { memo.phase = ""; return cb(); }
+  memo.phase = "silence";
+  memoLire(memoSilenceUrl(sec), () => { memo.phase = ""; cb(); });
+}
+function memoDireFr(txt, cb) {
+  memo.phase = "trad";
+  if (!txt || !("speechSynthesis" in window)) return cb();
+  const s = memo.sess;
+  let fait = false;
+  const fin = () => { if (!fait && s === memo.sess) { fait = true; cb(); } };
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang = "fr-FR"; u.rate = 0.9;
+  const voix = nmVoix("fr"); if (voix) u.voice = voix;
+  u.onend = fin; u.onerror = fin;
+  speechSynthesis.speak(u);
+  setTimeout(fin, 30000);
+}
+
+/* Moteur : joue le prochain verset de l'unité courante, puis passe à l'unité suivante. */
+function memoEtape() {
+  if (!memo.lecture) return;
+  const U = memo.unites[memo.u];
+  if (!U) return memoFin();
+  if (memo.p < U.plays.length) {
+    memo.i = U.plays[memo.p++];
+    memo.phase = "audio";
+    memoEnregistrerPos({ i: memo.i });
+    memoMedia(); memoMaj();
+    return memoLire(memoUrl(memo.i), memoEtape);
+  }
+  memo.u++; memo.p = 0;
+  const apres = () => memoSilence(memoRegl().pause, memoEtape);
+  if (memoRegl().trad && U.tour !== "sourate") return memoDireFr(memo.texte.fr[U.plays[U.plays.length - 1]], apres);
+  apres();
+}
+function memoFin() {
+  const f = (memoPos()[memo.n] || {}).fait || 0;
+  memo.lecture = false; memo.u = 0; memo.p = 0; memo.i = 0; memo.phase = "";
+  memoEnregistrerPos({ i: 0, fait: f + 1 });
+  memoVeille(false); memoMaj();
+  toast("Sourate entière récitée. Bravo !");
+}
+
+function memoReprendre() {
+  if (!memo.texte || memo.lecture) return;
+  if (!memo.unites.length) memoPrepare();
+  memo.lecture = true;
+  memoVeille(true); memoMedia();
+  if (memo.phase === "silence") { memoAudio.play().catch(() => {}); return memoMaj(); }
+  memoEtape();
+}
+function memoPause() {
+  memo.sess++;
+  if (!memo.lecture) return;
+  memo.lecture = false;
+  memoAudio.pause();
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  if (memo.phase === "audio") memo.p--;                       // rejoue le verset interrompu
+  if (memo.phase === "trad") { memo.u--; memo.p = memo.unites[memo.u].plays.length; } // relit la traduction
+  memoVeille(false); memoMaj();
+}
+function memoAller(i, jouer) {
+  if (!memo.texte || i < 0 || i >= memoNb(memo.n)) return;
+  memoPause();
+  memo.i = i; memo.u = memoVersUnit(i); memo.p = 0; memo.phase = "";
+  memoEnregistrerPos({ i });
+  memoMaj();
+  if (jouer) memoReprendre();
+}
+
+/* Écran verrouillé, volant, CarPlay : commandes système. */
+function memoMedia() {
+  if (!("mediaSession" in navigator) || !memo.texte) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: `${memoNom(memo.n)} · verset ${memo.i + 1}`,
+      artist: RECITATEURS[state.recitateur].nom,
+      album: "Mémorisation"
+    });
+    const ms = navigator.mediaSession;
+    const actif = () => !$("#vueMemo").hidden;
+    ms.setActionHandler("play", () => actif() && memoReprendre());
+    ms.setActionHandler("pause", () => actif() && memoPause());
+    ms.setActionHandler("previoustrack", () => actif() && memoAller(memo.i - 1, true));
+    ms.setActionHandler("nexttrack", () => actif() && memoAller(memo.i + 1, true));
+  } catch {}
+}
+async function memoVeille(on) {
+  try {
+    if (on && navigator.wakeLock && !memo.verrou) memo.verrou = await navigator.wakeLock.request("screen");
+    else if (!on && memo.verrou) { await memo.verrou.release(); memo.verrou = null; }
+  } catch {}
+}
+
+function memoMaj() {
+  const ok = !!memo.texte, n = memoNb(memo.n), U = memo.unites[memo.u];
+  $("#memoAr").textContent = ok ? memo.texte.ar[memo.i] : "";
+  $("#memoFr").textContent = ok ? memo.texte.fr[memo.i] : "";
+  $("#memoEtat").textContent = ok
+    ? `${memo.lecture ? "▶ En lecture" : (U ? "⏸ En pause" : "■ Terminé")} · verset ${memo.i + 1}/${n}${U && memo.lecture ? " · " + U.tour + " " + U.r + "/" + U.R : ""}`
+    : "";
+  $("#memoBarreFill").style.width = memo.unites.length ? (memo.u / memo.unites.length * 100) + "%" : "0%";
+  const bouton = $("#memoPlay");
+  bouton.textContent = memo.lecture ? "⏸" : "▶";
+  bouton.setAttribute("aria-label", memo.lecture ? "Pause" : "Lecture");
+  $("#memoFait").textContent = ok ? `Séances complètes : ${(memoPos()[memo.n] || {}).fait || 0}` : "";
+  document.querySelectorAll(".memo-v").forEach((b) => {
+    const courant = Number(b.dataset.i) === memo.i;
+    if (courant && b.getAttribute("aria-current") !== "true" && memo.lecture) b.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    b.setAttribute("aria-current", String(courant));
+  });
+}
+
+function memoListe() {
+  const L = $("#memoListe");
+  L.textContent = "";
+  memo.texte.ar.forEach((a, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "memo-v"; b.dataset.i = i;
+    const num = document.createElement("span"); num.className = "memo-num"; num.textContent = i + 1;
+    const ar = document.createElement("span"); ar.className = "memo-ar2"; ar.lang = "ar"; ar.textContent = a;
+    const fr = document.createElement("span"); fr.className = "memo-fr2"; fr.textContent = memo.texte.fr[i];
+    b.append(num, ar, fr);
+    L.append(b);
+  });
+}
+
+async function memoChoisir(n) {
+  memoPause();
+  memo.n = n; memo.texte = null; memo.unites = [];
+  store.set("vc-memo-sourate", n);
+  const msg = $("#memoChargement"), retry = $("#memoRetry");
+  msg.hidden = false; msg.textContent = "Chargement du texte…"; retry.hidden = true;
+  $("#memoAr").textContent = ""; $("#memoFr").textContent = ""; $("#memoListe").textContent = "";
+  try {
+    const t = await memoCharger(n);
+    if (memo.n !== n) return;
+    memo.texte = t;
+  } catch {
+    if (memo.n !== n) return;
+    msg.textContent = "Texte indisponible pour le moment. Vérifiez votre connexion Internet, puis réessayez.";
+    retry.hidden = false;
+    return;
+  }
+  msg.hidden = true;
+  memo.i = (memoPos()[n] || {}).i || 0;
+  memoPrepare();
+  memoListe(); memoMaj();
+}
+
+function initMemo() {
+  const sel = $("#memoSourate");
+  MEMO_SOURATES.forEach(([n, nom, c]) => sel.add(new Option(`${n}. ${nom} (${c} v.)`, n)));
+  sel.value = store.get("vc-memo-sourate", 112);
+  const reg = store.get("vc-memo-reglages", null);
+  if (reg) {
+    $("#memoRV").value = reg.rv; $("#memoRC").value = reg.rc; $("#memoRS").value = reg.rs;
+    $("#memoPause").value = reg.pause; $("#memoTrad").checked = !!reg.trad;
+  }
+  sel.addEventListener("change", () => memoChoisir(Number(sel.value)));
+  ["#memoRV", "#memoRC", "#memoRS", "#memoPause", "#memoTrad"].forEach((s) => $(s).addEventListener("change", () => {
+    store.set("vc-memo-reglages", memoRegl());
+    if (memo.texte) { memoPause(); memoPrepare(); memoMaj(); }
+  }));
+  $("#memoPlay").addEventListener("click", () => (memo.lecture ? memoPause() : memoReprendre()));
+  $("#memoPrev").addEventListener("click", () => memoAller(memo.i - 1, memo.lecture));
+  $("#memoNext").addEventListener("click", () => memoAller(memo.i + 1, memo.lecture));
+  $("#memoRestart").addEventListener("click", () => { if (memo.texte) memoAller(0, true); });
+  $("#memoRetry").addEventListener("click", () => memoChoisir(memo.n));
+  $("#memoListe").addEventListener("click", (e) => {
+    const b = e.target.closest(".memo-v");
+    if (b) memoAller(Number(b.dataset.i), true);
+  });
+}
+initMemo();
+
+const VUES = ["mots", "duas", "savoir", "omra", "recherche", "revision", "noms", "memo"];
 afficherVue(location.hash === "#invocations" ? "duas" : location.hash === "#savoir" ? "savoir" : VUES.includes(store.get("vc-vue", "mots")) ? store.get("vc-vue", "mots") : "mots");
 </script>
 </body>
