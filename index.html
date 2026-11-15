@@ -2843,6 +2843,7 @@ function nmDire(texte, lang, vitesse, fin) {
 }
 
 function nmParler(i, fin) {
+  if (i === 0) return fin(); // ouverture Allah : affiché, sans audio
   const v = Number($("#nmVit").value) || 1;
   const [ar, , fr] = NOMS[i];
   const apresArabe = () => nmDire(fr, "fr-FR", 0.95 * v, fin);
