@@ -3139,7 +3139,7 @@ function memoRegl() {
 }
 
 async function memoCharger(n) {
-  const cle = "vc-memo-texte-" + n;
+  const cle = "vc-memo-texte2-" + n;
   const cache = store.get(cle, null);
   if (cache && cache.ar && cache.ar.length === memoNb(n)) return cache;
   let t = null;
@@ -3154,8 +3154,16 @@ async function memoCharger(n) {
     } catch {}
   }
   if (!t || t.ar.length !== memoNb(n)) throw new Error("texte indisponible");
+  if (n !== 1 && n !== 9) t.ar[0] = memoSansBasmala(t.ar[0]);
   store.set(cle, t);
   return t;
+}
+/* L'API ajoute la basmala au verset 1 : on la retire (sauf Al-Fatiha et At-Tawba). */
+function memoSansBasmala(texte) {
+  const norm = (w) => w.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, "").replace(/\u0671/g, "\u0627");
+  const mots = texte.split(" ");
+  const tete = mots.slice(0, 4).map(norm).join(" ");
+  return tete === "بسم الله الرحمن الرحيم" ? mots.slice(4).join(" ") : texte;
 }
 
 /* Méthode cumulative : chaque verset ×N ; à partir du 2e, enchaînement 1→i ×M ; puis sourate entière ×K.
@@ -3195,8 +3203,20 @@ function memoSilenceUrl(sec) {
 
 function memoLire(url, fin) {
   memo.fin = fin;
-  memoAudio.src = url;
+  if (memoAudio.src === url) memoAudio.currentTime = 0;   // répétition : même fichier, pas de rechargement
+  else memoAudio.src = url;
   memoAudio.play().catch(() => { if (memo.lecture) { memoPause(); toast("Récitation indisponible. Vérifiez votre connexion Internet."); } });
+}
+/* Précharge le prochain verset dans le cache du navigateur pour éviter le silence entre deux versets. */
+function memoPrecharger() {
+  let suivant = null;
+  const U = memo.unites[memo.u];
+  if (U && memo.p < U.plays.length) suivant = U.plays[memo.p];
+  else if (memo.unites[memo.u + 1]) suivant = memo.unites[memo.u + 1].plays[0];
+  if (suivant === null || suivant === undefined) return;
+  const a = new Audio();
+  a.preload = "auto";
+  a.src = memoUrl(suivant);
 }
 function memoSilence(sec, cb) {
   if (!memo.lecture) return;
@@ -3228,6 +3248,7 @@ function memoEtape() {
     memo.phase = "audio";
     memoEnregistrerPos({ i: memo.i });
     memoMedia(); memoMaj();
+    memoPrecharger();
     return memoLire(memoUrl(memo.i), memoEtape);
   }
   memo.u++; memo.p = 0;
