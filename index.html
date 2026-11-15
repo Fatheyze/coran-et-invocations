@@ -195,6 +195,36 @@
 
   .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); max-width: calc(100% - 32px); z-index: 20; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  /* Les 99 noms d'Allah : cadran nocturne, toujours sombre quel que soit le thème. */
+  .nm-wrap { background: radial-gradient(circle at 50% 36%, #16274f 0%, #070f24 62%, #040a1a 100%); color: #f4efe2; border-radius: 28px; padding: 26px 14px 24px; text-align: center; border: 1px solid color-mix(in srgb, #d9b45a 28%, transparent); }
+  .nm-eyebrow { font-family: var(--font-display); color: #d9b45a; letter-spacing: .3em; text-transform: uppercase; font-size: 12px; }
+  .nm-dial { position: relative; width: 100%; max-width: 400px; aspect-ratio: 1; margin: 8px auto 0; }
+  .nm-svg { width: 100%; height: 100%; display: block; touch-action: none; cursor: pointer; overflow: visible; outline: none; }
+  .nm-svg:focus-visible { outline: 2px solid #d9b45a; outline-offset: 6px; border-radius: 50%; }
+  .nm-ring { fill: none; stroke: #d9b45a; stroke-opacity: .16; stroke-width: 1; }
+  .nm-tick { stroke: #d9b45a; stroke-opacity: .5; stroke-width: 1; }
+  .nm-txt { font-family: var(--font-ar); font-size: 9.5px; fill: #f4efe2; opacity: .12; transition: opacity .5s ease, fill .4s ease; }
+  .nm-txt.on { opacity: .85; }
+  .nm-txt.cur { fill: #f5d98a; opacity: 1; }
+  .nm-prog { fill: none; stroke: #d9b45a; stroke-width: 2; stroke-linecap: round; transition: stroke-dasharray .6s ease; }
+  .nm-cur { transform-origin: 200px 200px; transform-box: view-box; transition: transform .6s cubic-bezier(.3, .7, .3, 1); }
+  .nm-dot { fill: #f5d98a; filter: drop-shadow(0 0 6px #d9b45a); }
+  .nm-stick { stroke: #d9b45a; stroke-width: 2; }
+  .nm-centre { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .nm-ar { font-family: var(--font-ar); font-weight: 700; font-size: clamp(54px, 15vw, 82px); line-height: 2.1; padding: .1em .2em; direction: rtl; color: #f4efe2; text-shadow: 0 0 24px rgba(217, 180, 90, .28); }
+  .nm-tr { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 8vw, 40px); line-height: 1.2; margin: 14px 0 0; color: #f4efe2; }
+  .nm-fr { color: #d9b45a; font-weight: 700; font-size: 18px; margin: 4px 0 0; }
+  .nm-fam { font-size: 12px; color: #9ba8c4; letter-spacing: .14em; text-transform: uppercase; margin-top: 8px; }
+  .nm-num { font-family: var(--font-display); font-size: 18px; margin-top: 12px; color: #f4efe2; font-variant-numeric: tabular-nums; }
+  .nm-num b { color: #d9b45a; font-weight: 400; }
+  .nm-ctrl { display: flex; gap: 12px; justify-content: center; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .nm-btn { width: 52px; height: 52px; border-radius: 999px; border: 1px solid rgba(217, 180, 90, .5); background: rgba(217, 180, 90, .08); color: #f4efe2; font-size: 18px; cursor: pointer; }
+  .nm-btn:hover { background: rgba(217, 180, 90, .2); }
+  .nm-btn.nm-play { width: 66px; height: 66px; background: #d9b45a; color: #0e1c3a; border-color: #d9b45a; font-size: 22px; }
+  .nm-btn.nm-play:hover { background: #e8c56f; }
+  .nm-vit select { background: transparent; color: #f4efe2; border: 1px solid rgba(217, 180, 90, .5); border-radius: 999px; padding: 10px 14px; font-size: 14px; }
+  .nm-vit select option { color: #0f1b33; }
+  .nm-note { color: #9ba8c4; font-size: 13px; margin: 18px auto 0; max-width: 44ch; }
 </style>
 </head>
 <body>
@@ -221,6 +251,7 @@
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="mots" aria-selected="true"><span class="ic" aria-hidden="true">📖</span>Vocabulaire</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="duas" aria-selected="false"><span class="ic" aria-hidden="true">🤲</span>Invocations</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="savoir" aria-selected="false"><span class="ic" aria-hidden="true">💡</span>Savoir</button>
+    <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="noms" aria-selected="false"><span class="ic" aria-hidden="true">📿</span>99 Noms</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="omra" aria-selected="false"><span class="ic" aria-hidden="true">🕋</span>Omra</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="recherche" aria-selected="false"><span class="ic" aria-hidden="true">🔎</span>Recherche</button>
     <button class="tab rounded-2xl px-2 py-2" type="button" role="tab" data-vue="revision" aria-selected="false"><span class="ic" aria-hidden="true">🔁</span>Révision</button>
@@ -331,6 +362,31 @@
   <div class="flex justify-center mt-10">
     <button id="revReset" class="chip rounded-full px-4 py-2 text-sm" type="button">Recommencer le programme</button>
   </div>
+</main>
+</div>
+
+<div id="vueNoms" hidden>
+<main class="gutter mx-auto max-w-6xl" style="padding-block: 24px 48px;">
+  <section class="nm-wrap" aria-label="Les 99 noms d'Allah">
+    <p class="nm-eyebrow">Les 99 noms d'Allah</p>
+    <div class="nm-dial">
+      <svg id="nmSvg" class="nm-svg" viewBox="0 0 400 400" role="slider" tabindex="0" aria-label="Choisir un nom d'Allah" aria-valuemin="0" aria-valuemax="99" aria-valuenow="0"></svg>
+      <div class="nm-centre"><div id="nmAr" class="nm-ar" lang="ar"></div></div>
+    </div>
+    <h2 id="nmTr" class="nm-tr"></h2>
+    <p id="nmFr" class="nm-fr"></p>
+    <p id="nmFam" class="nm-fam"></p>
+    <p class="nm-num"><span id="nmNum">—</span> <b>/ <span id="nmTot">99</span></b></p>
+    <div class="nm-ctrl">
+      <button id="nmPrev" class="nm-btn" type="button" aria-label="Nom précédent">⏮</button>
+      <button id="nmPlay" class="nm-btn nm-play" type="button" aria-label="Lecture">▶</button>
+      <button id="nmNext" class="nm-btn" type="button" aria-label="Nom suivant">⏭</button>
+      <label class="nm-vit"><span class="sr-only">Vitesse de lecture</span>
+        <select id="nmVit"><option value="0.75">0,75×</option><option value="1" selected>1×</option><option value="1.25">1,25×</option></select>
+      </label>
+    </div>
+    <p class="nm-note">Faites tourner le curseur, ou touchez un nom de l'anneau pour l'écouter. Chaque nom est prononcé en arabe, puis sa traduction en français.</p>
+  </section>
 </main>
 </div>
 
@@ -2649,6 +2705,293 @@ $("#revReset").addEventListener("click", () => {
   rendreRevision();
 });
 
+const NOMS = [
+  ["اللَّهُ", "Allah", "Le Dieu, l'Être suprême", "Unicité"],
+  ["الرَّحْمَٰنُ", "Ar-Rahman", "Le Tout-Miséricordieux", "Miséricorde"],
+  ["الرَّحِيمُ", "Ar-Rahim", "Le Très-Miséricordieux", "Miséricorde"],
+  ["الْمَلِكُ", "Al-Malik", "Le Souverain", "Majesté"],
+  ["الْقُدُّوسُ", "Al-Quddus", "Le Saint", "Majesté"],
+  ["السَّلَامُ", "As-Salam", "La Paix", "Beauté"],
+  ["الْمُؤْمِنُ", "Al-Mu'min", "Le Fidèle, le Garant de la sécurité", "Protection"],
+  ["الْمُهَيْمِنُ", "Al-Muhaymin", "Le Préservateur", "Protection"],
+  ["الْعَزِيزُ", "Al-'Aziz", "Le Tout-Puissant", "Puissance"],
+  ["الْجَبَّارُ", "Al-Jabbar", "Le Contraignant", "Puissance"],
+  ["الْمُتَكَبِّرُ", "Al-Mutakabbir", "Le Magnifique", "Majesté"],
+  ["الْخَالِقُ", "Al-Khaliq", "Le Créateur", "Création"],
+  ["الْبَارِئُ", "Al-Bari'", "Le Producteur", "Création"],
+  ["الْمُصَوِّرُ", "Al-Musawwir", "Le Formateur", "Création"],
+  ["الْغَفَّارُ", "Al-Ghaffar", "Le Grand Pardonneur", "Miséricorde"],
+  ["الْقَهَّارُ", "Al-Qahhar", "Le Dominateur Suprême", "Puissance"],
+  ["الْوَهَّابُ", "Al-Wahhab", "Le Donateur gracieux", "Providence"],
+  ["الرَّزَّاقُ", "Ar-Razzaq", "Le Pourvoyeur", "Providence"],
+  ["الْفَتَّاحُ", "Al-Fattah", "L'Opérateur, Juge", "Providence"],
+  ["الْعَلِيمُ", "Al-'Alim", "L'Omniscient", "Science"],
+  ["الْقَابِضُ", "Al-Qabid", "Celui qui retient", "Providence"],
+  ["الْبَاسِطُ", "Al-Basit", "Celui qui étend", "Providence"],
+  ["الْخَافِضُ", "Al-Khafid", "Le Réducteur", "Justice"],
+  ["الرَّافِعُ", "Ar-Rafi'", "L'Éleveur", "Justice"],
+  ["الْمُعِزُّ", "Al-Mu'izz", "Celui qui honore", "Justice"],
+  ["الْمُذِلُّ", "Al-Mudhill", "Celui qui humilie", "Justice"],
+  ["السَّمِيعُ", "As-Sami'", "L'Audient", "Connaissance"],
+  ["الْبَصِيرُ", "Al-Basir", "Le Clairvoyant", "Connaissance"],
+  ["الْحَكَمُ", "Al-Hakam", "Le Juge", "Justice"],
+  ["الْعَدْلُ", "Al-'Adl", "Le Juste", "Justice"],
+  ["اللَّطِيفُ", "Al-Latif", "Le Subtil", "Miséricorde"],
+  ["الْخَبِيرُ", "Al-Khabir", "Le Bien-Informé", "Science"],
+  ["الْحَلِيمُ", "Al-Halim", "Le Clément", "Miséricorde"],
+  ["الْعَظِيمُ", "Al-'Adhim", "L'Immense", "Majesté"],
+  ["الْغَفُورُ", "Al-Ghafur", "Le Grand Pardonneur", "Miséricorde"],
+  ["الشَّكُورُ", "Ash-Shakur", "Le Très-Reconnaissant", "Beauté"],
+  ["الْعَلِيُّ", "Al-'Ali", "Le Très-Haut", "Majesté"],
+  ["الْكَبِيرُ", "Al-Kabir", "Le Très-Grand", "Majesté"],
+  ["الْحَفِيظُ", "Al-Hafidh", "Le Gardien", "Protection"],
+  ["الْمُقِيتُ", "Al-Muqit", "Le Nourricier", "Providence"],
+  ["الْحَسِيبُ", "Al-Hasib", "Le Comptable", "Justice"],
+  ["الْجَلِيلُ", "Al-Jalil", "Le Majestueux", "Majesté"],
+  ["الْكَرِيمُ", "Al-Karim", "Le Noble, le Généreux", "Générosité"],
+  ["الرَّقِيبُ", "Ar-Raqib", "Le Vigilant", "Protection"],
+  ["الْمُجِيبُ", "Al-Mujib", "Celui qui exauce", "Réponse"],
+  ["الْوَاسِعُ", "Al-Wasi'", "L'Infiniment Vaste", "Majesté"],
+  ["الْحَكِيمُ", "Al-Hakim", "Le Sage", "Sagesse"],
+  ["الْوَدُودُ", "Al-Wadud", "Le Bien-Aimant", "Amour"],
+  ["الْمَجِيدُ", "Al-Majid", "Le Glorieux", "Gloire"],
+  ["الْبَاعِثُ", "Al-Ba'ith", "Le Ressusciteur", "Résurrection"],
+  ["الشَّهِيدُ", "Ash-Shahid", "Le Témoin", "Surveillance"],
+  ["الْحَقُّ", "Al-Haqq", "La Vérité", "Vérité"],
+  ["الْوَكِيلُ", "Al-Wakil", "Le Garant", "Protection"],
+  ["الْقَوِيُّ", "Al-Qawiyy", "Le Très-Fort", "Puissance"],
+  ["الْمَتِينُ", "Al-Matin", "Le Très-Ferme", "Puissance"],
+  ["الْوَلِيُّ", "Al-Waliyy", "Le Protecteur", "Protection"],
+  ["الْحَمِيدُ", "Al-Hamid", "Le Loué", "Louange"],
+  ["الْمُحْصِي", "Al-Muhsi", "Le Comptabilisateur", "Science"],
+  ["الْمُبْدِئُ", "Al-Mubdi'", "Le Novateur", "Création"],
+  ["الْمُعِيدُ", "Al-Mu'id", "Celui qui ramène", "Résurrection"],
+  ["الْمُحْيِي", "Al-Muhyi", "Le Vivificateur", "Création"],
+  ["الْمُمِيتُ", "Al-Mumit", "Le Donneur de mort", "Création"],
+  ["الْحَيُّ", "Al-Hayy", "Le Vivant", "Vie"],
+  ["الْقَيُّومُ", "Al-Qayyum", "Le Subsistant", "Existence"],
+  ["الْوَاجِدُ", "Al-Wajid", "Le Trouveur", "Création"],
+  ["الْمَاجِدُ", "Al-Majid", "Le Noble par excellence", "Noblesse"],
+  ["الْوَاحِدُ", "Al-Wahid", "L'Unique", "Unicité"],
+  ["الْأَحَدُ", "Al-Ahad", "L'Unique", "Unicité"],
+  ["الصَّمَدُ", "As-Samad", "L'Absolu", "Suffisance"],
+  ["الْقَادِرُ", "Al-Qadir", "Le Capable", "Puissance"],
+  ["الْمُقْتَدِرُ", "Al-Muqtadir", "Le Tout-Puissant", "Puissance"],
+  ["الْمُقَدِّمُ", "Al-Muqaddim", "Celui qui avance", "Volonté"],
+  ["الْمُؤَخِّرُ", "Al-Mu'akhkhir", "Celui qui retarde", "Volonté"],
+  ["الْأَوَّلُ", "Al-Awwal", "Le Premier", "Éternité"],
+  ["الْآخِرُ", "Al-Akhir", "Le Dernier", "Éternité"],
+  ["الظَّاهِرُ", "Az-Zahir", "Le Manifeste", "Manifestation"],
+  ["الْبَاطِنُ", "Al-Batin", "Le Caché", "Inaccessibilité"],
+  ["الْوَالِي", "Al-Wali", "Le Gouverneur", "Souveraineté"],
+  ["الْمُتَعَالِي", "Al-Muta'ali", "Le Très-Élevé", "Majesté"],
+  ["الْبَرُّ", "Al-Barr", "Le Bienfaiteur", "Bonté"],
+  ["التَّوَّابُ", "At-Tawwab", "Celui qui accueille le repentir", "Miséricorde"],
+  ["الْمُنْتَقِمُ", "Al-Muntaqim", "Le Vengeur", "Justice"],
+  ["الْعَفُوُّ", "Al-'Afuww", "Le Pardonneur", "Miséricorde"],
+  ["الرَّءُوفُ", "Ar-Ra'uf", "Le Très-Clément", "Miséricorde"],
+  ["مَالِكُ الْمُلْكِ", "Malik-ul-Mulk", "Le Maître du Royaume", "Souveraineté"],
+  ["ذُو الْجَلَالِ وَالْإِكْرَامِ", "Dhul-Jalali-Wal-Ikram", "Le Détenteur de Majesté et de Munificence", "Majesté"],
+  ["الْمُقْسِطُ", "Al-Muqsit", "L'Équitable", "Justice"],
+  ["الْجَامِعُ", "Al-Jami'", "Le Rassembleur", "Unité"],
+  ["الْغَنِيُّ", "Al-Ghani", "Le Riche", "Autosuffisance"],
+  ["الْمُغْنِي", "Al-Mughni", "L'Enrichissant", "Générosité"],
+  ["الْمَانِعُ", "Al-Mani'", "Le Défenseur", "Protection"],
+  ["الضَّارُّ", "Ad-Darr", "Celui qui afflige", "Épreuve"],
+  ["النَّافِعُ", "An-Nafi'", "Celui qui profite", "Bienfaisance"],
+  ["النُّورُ", "An-Nur", "La Lumière", "Lumière"],
+  ["الْهَادِي", "Al-Hadi", "Le Guide", "Guidance"],
+  ["الْبَدِيعُ", "Al-Badi'", "L'Incomparable", "Création"],
+  ["الْبَاقِي", "Al-Baqi", "L'Éternel", "Éternité"],
+  ["الْوَارِثُ", "Al-Warith", "L'Héritier", "Héritage"],
+  ["الرَّشِيدُ", "Ar-Rashid", "Le Guide par la droiture", "Guidance"],
+  ["الصَّبُورُ", "As-Sabur", "Le Patient", "Patience"]
+];
+
+/* ---------- Les 99 noms d'Allah ---------- */
+let nmIdx = Math.min(NOMS.length - 1, Math.max(0, Number(store.get("vc-noms", 0)) || 0));
+let nmEcoute = false;
+let nmSession = 0;
+
+/* Récitation : fichier MP3 si l'index a une URL dans NOMS_AUDIO, sinon voix du navigateur. */
+// Récitation arabe enregistrée, par index (0 = Allah, sans fichier : voix du navigateur). Index k = fichier k (01 = Ar-Rahman, 99 = As-Sabur).
+const NOMS_AUDIO = [null, "audio/noms/01.aac", "audio/noms/02.aac", "audio/noms/03.aac", "audio/noms/04.aac", "audio/noms/05.aac", "audio/noms/06.aac", "audio/noms/07.aac", "audio/noms/08.aac", "audio/noms/09.aac", "audio/noms/10.aac", "audio/noms/11.aac", "audio/noms/12.aac", "audio/noms/13.aac", "audio/noms/14.aac", "audio/noms/15.aac", "audio/noms/16.aac", "audio/noms/17.aac", "audio/noms/18.aac", "audio/noms/19.aac", "audio/noms/20.aac", "audio/noms/21.aac", "audio/noms/22.aac", "audio/noms/23.aac", "audio/noms/24.aac", "audio/noms/25.aac", "audio/noms/26.aac", "audio/noms/27.aac", "audio/noms/28.aac", "audio/noms/29.aac", "audio/noms/30.aac", "audio/noms/31.aac", "audio/noms/32.aac", "audio/noms/33.aac", "audio/noms/34.aac", "audio/noms/35.aac", "audio/noms/36.aac", "audio/noms/37.aac", "audio/noms/38.aac", "audio/noms/39.aac", "audio/noms/40.aac", "audio/noms/41.aac", "audio/noms/42.aac", "audio/noms/43.aac", "audio/noms/44.aac", "audio/noms/45.aac", "audio/noms/46.aac", "audio/noms/47.aac", "audio/noms/48.aac", "audio/noms/49.aac", "audio/noms/50.aac", "audio/noms/51.aac", "audio/noms/52.aac", "audio/noms/53.aac", "audio/noms/54.aac", "audio/noms/55.aac", "audio/noms/56.aac", "audio/noms/57.aac", "audio/noms/58.aac", "audio/noms/59.aac", "audio/noms/60.aac", "audio/noms/61.aac", "audio/noms/62.aac", "audio/noms/63.aac", "audio/noms/64.aac", "audio/noms/65.aac", "audio/noms/66.aac", "audio/noms/67.aac", "audio/noms/68.aac", "audio/noms/69.aac", "audio/noms/70.aac", "audio/noms/71.aac", "audio/noms/72.aac", "audio/noms/73.aac", "audio/noms/74.aac", "audio/noms/75.aac", "audio/noms/76.aac", "audio/noms/77.aac", "audio/noms/78.aac", "audio/noms/79.aac", "audio/noms/80.aac", "audio/noms/81.aac", "audio/noms/82.aac", "audio/noms/83.aac", "audio/noms/84.aac", "audio/noms/85.aac", "audio/noms/86.aac", "audio/noms/87.aac", "audio/noms/88.aac", "audio/noms/89.aac", "audio/noms/90.aac", "audio/noms/91.aac", "audio/noms/92.aac", "audio/noms/93.aac", "audio/noms/94.aac", "audio/noms/95.aac", "audio/noms/96.aac", "audio/noms/97.aac", "audio/noms/98.aac", "audio/noms/99.aac"];
+let nmAudio = null;
+
+function nmStopAudio() {
+  if (nmAudio) { nmAudio.pause(); nmAudio = null; }
+}
+
+function nmVoix(lang) {
+  if (!("speechSynthesis" in window)) return null;
+  const voix = speechSynthesis.getVoices().filter((v) => v.lang && v.lang.toLowerCase().startsWith(lang));
+  return voix.find((v) => /premium|enhanced|natural|neural/i.test(v.name))
+    || voix.find((v) => /google|microsoft/i.test(v.name))
+    || voix[0] || null;
+}
+
+function nmDire(texte, lang, vitesse, fin) {
+  if (!("speechSynthesis" in window)) return fin();
+  const u = new SpeechSynthesisUtterance(texte);
+  u.lang = lang;
+  u.rate = vitesse;
+  const voix = nmVoix(lang.slice(0, 2));
+  if (voix) u.voice = voix;
+  u.onend = () => fin();
+  u.onerror = () => fin();
+  speechSynthesis.speak(u);
+}
+
+function nmParler(i, fin) {
+  if (i === 0) return fin(); // ouverture Allah : affiché, sans audio
+  const v = Number($("#nmVit").value) || 1;
+  const [ar, , fr] = NOMS[i];
+  const apresArabe = () => nmDire(fr, "fr-FR", 0.95 * v, fin);
+  const dire = () => nmDire(ar, "ar-SA", 0.8 * v, apresArabe);
+  const url = NOMS_AUDIO[i];
+  if (url) {
+    nmStopAudio();
+    nmAudio = new Audio(url);
+    nmAudio.playbackRate = v;
+    nmAudio.onended = apresArabe;
+    nmAudio.onerror = dire;
+    nmAudio.play().catch(dire);
+    return;
+  }
+  dire();
+}
+
+function nmLancer() {
+  const s = ++nmSession;
+  nmStopAudio();
+  nmEcoute = true; nmBouton();
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  const suite = () => {
+    if (s !== nmSession || !nmEcoute) return;
+    if (nmIdx >= NOMS.length - 1) return nmArreter();
+    const v = Number($("#nmVit").value) || 1;
+    setTimeout(() => {
+      if (s !== nmSession || !nmEcoute) return;
+      nmIdx++; nmMaj(); nmParler(nmIdx, suite);
+    }, 900 / v);
+  };
+  nmParler(nmIdx, suite);
+}
+
+function nmArreter() {
+  nmSession++; nmEcoute = false;
+  nmStopAudio();
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  nmBouton();
+}
+
+function nmAller(i, unique) {
+  nmIdx = Math.max(0, Math.min(NOMS.length - 1, i));
+  store.set("vc-noms", nmIdx);
+  nmMaj();
+  if (nmEcoute) return nmLancer();
+  if (unique) nmParler(nmIdx, () => {});
+}
+
+function nmBouton() {
+  const b = $("#nmPlay");
+  b.textContent = nmEcoute ? "❚❚" : "▶";
+  b.setAttribute("aria-label", nmEcoute ? "Pause" : "Lecture");
+}
+
+function nmMaj() {
+  const [ar, tr, fr, fam] = NOMS[nmIdx];
+  $("#nmAr").textContent = ar;
+  $("#nmTr").textContent = tr;
+  $("#nmFr").textContent = fr;
+  $("#nmFam").textContent = fam;
+  const N = NOMS.length - 1;
+  $("#nmNum").textContent = nmIdx === 0 ? "—" : String(nmIdx).padStart(2, "0");
+  $("#nmTot").textContent = String(N);
+  const svg = $("#nmSvg");
+  svg.setAttribute("aria-valuenow", nmIdx);
+  svg.setAttribute("aria-valuetext", `${tr} : ${fr}`);
+  document.querySelectorAll(".nm-txt").forEach((t) => {
+    const i = Number(t.dataset.i);
+    t.classList.toggle("on", i <= nmIdx);
+    t.classList.toggle("cur", i === nmIdx);
+  });
+  $(".nm-cur").style.transform = `rotate(${nmIdx > 0 ? (nmIdx - 1) * (360 / N) : 0}deg)`;
+  $(".nm-prog").style.strokeDasharray = `${nmIdx} ${N}`;
+}
+
+function nmConstruire() {
+  const svg = $("#nmSvg");
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, cls) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (cls) e.setAttribute("class", cls);
+    return e;
+  };
+  const N = NOMS.length - 1; // 98 noms sur l'anneau ; Allah (idx 0) n'y figure pas
+  const pas = 360 / N;
+  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 150 }, "nm-ring"));
+  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 118 }, "nm-ring"));
+  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 86 }, "nm-ring"));
+  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 186 }, "nm-ring"));
+  for (let i = 1; i <= N; i++) {
+    const rot = `rotate(${(i - 1) * pas} 200 200)`;
+    svg.appendChild(el("line", { x1: 200, y1: 12, x2: 200, y2: 21, transform: rot }, "nm-tick"));
+    const t = el("text", { x: 200, y: 42, "text-anchor": "middle", transform: rot, "data-i": i }, "nm-txt");
+    t.textContent = NOMS[i][0];
+    svg.appendChild(t);
+  }
+  svg.appendChild(el("circle", { cx: 200, cy: 200, r: 188, pathLength: N, transform: "rotate(-90 200 200)" }, "nm-prog"));
+  const cur = el("g", {}, "nm-cur");
+  cur.appendChild(el("line", { x1: 200, y1: 24, x2: 200, y2: 56 }, "nm-stick"));
+  cur.appendChild(el("circle", { cx: 200, cy: 12, r: 7 }, "nm-dot"));
+  svg.appendChild(cur);
+
+  const indexDe = (e) => {
+    const r = svg.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width / 2;
+    const y = e.clientY - r.top - r.height / 2;
+    let a = Math.atan2(y, x) * 180 / Math.PI + 90;
+    if (a < 0) a += 360;
+    return (Math.round(a / pas) % N) + 1;
+  };
+  let glisse = false;
+  svg.addEventListener("pointerdown", (e) => {
+    glisse = true;
+    svg.setPointerCapture(e.pointerId);
+    nmAller(indexDe(e), true);
+  });
+  svg.addEventListener("pointermove", (e) => {
+    if (glisse && indexDe(e) !== nmIdx) { nmIdx = indexDe(e); nmMaj(); }
+  });
+  const fin = () => {
+    if (!glisse) return;
+    glisse = false;
+    if (nmEcoute) nmLancer();
+  };
+  svg.addEventListener("pointerup", fin);
+  svg.addEventListener("pointercancel", fin);
+  svg.addEventListener("keydown", (e) => {
+    const sens = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 };
+    if (e.key in sens) { e.preventDefault(); nmAller(nmIdx + sens[e.key], true); }
+    if (e.key === "Home") nmAller(0, true);
+    if (e.key === "End") nmAller(NOMS.length - 1, true);
+  });
+}
+
+function initNoms() {
+  nmConstruire();
+  nmMaj();
+  nmBouton();
+  $("#nmPlay").addEventListener("click", () => (nmEcoute ? nmArreter() : nmLancer()));
+  $("#nmPrev").addEventListener("click", () => nmAller(nmIdx - 1, true));
+  $("#nmNext").addEventListener("click", () => nmAller(nmIdx + 1, true));
+  $("#nmVit").addEventListener("change", () => { if (nmEcoute) nmLancer(); });
+}
+initNoms();
+
+
 /* ---------- Onglets ---------- */
 function afficherVue(vue) {
   stopTout();
@@ -2659,6 +3002,8 @@ function afficherVue(vue) {
   $("#vueOmra").hidden = vue !== "omra";
   $("#vueRecherche").hidden = vue !== "recherche";
   $("#vueRevision").hidden = vue !== "revision";
+  $("#vueNoms").hidden = vue !== "noms";
+  if (vue !== "noms") nmArreter();
   if (vue === "revision") rendreRevision();
   store.set("vc-vue", vue);
 }
@@ -2685,7 +3030,7 @@ rendreSavoir();
 rendreOmra();
 rendreRecherche();
 synchroniserRevision();
-const VUES = ["mots", "duas", "savoir", "omra", "recherche", "revision"];
+const VUES = ["mots", "duas", "savoir", "omra", "recherche", "revision", "noms"];
 afficherVue(location.hash === "#invocations" ? "duas" : location.hash === "#savoir" ? "savoir" : VUES.includes(store.get("vc-vue", "mots")) ? store.get("vc-vue", "mots") : "mots");
 </script>
 </body>
