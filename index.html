@@ -2813,7 +2813,8 @@ let nmEcoute = false;
 let nmSession = 0;
 
 /* Récitation : fichier MP3 si l'index a une URL dans NOMS_AUDIO, sinon voix du navigateur. */
-const NOMS_AUDIO = []; // ex. NOMS_AUDIO[0] = "https://.../001-allah.mp3" ; vide = voix de secours
+// Récitation arabe enregistrée, par index (0 = Allah). Les noms sans fichier utilisent la voix du navigateur.
+const NOMS_AUDIO = ["audio/noms/01.aac", "audio/noms/02.aac", "audio/noms/03.aac", "audio/noms/04.aac", "audio/noms/05.aac", "audio/noms/06.aac", "audio/noms/07.aac", "audio/noms/08.aac", "audio/noms/09.aac", "audio/noms/10.aac", "audio/noms/11.aac", "audio/noms/12.aac", "audio/noms/13.aac", "audio/noms/14.aac", "audio/noms/15.aac", "audio/noms/16.aac"];
 let nmAudio = null;
 
 function nmStopAudio() {
