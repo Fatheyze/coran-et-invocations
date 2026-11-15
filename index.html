@@ -211,7 +211,7 @@
   .nm-dot { fill: #f5d98a; filter: drop-shadow(0 0 6px #d9b45a); }
   .nm-stick { stroke: #d9b45a; stroke-width: 2; }
   .nm-centre { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-  .nm-ar { font-family: var(--font-ar); font-weight: 700; font-size: clamp(54px, 15vw, 82px); line-height: 1.6; direction: rtl; color: #f4efe2; text-shadow: 0 0 24px rgba(217, 180, 90, .28); }
+  .nm-ar { font-family: var(--font-ar); font-weight: 700; font-size: clamp(54px, 15vw, 82px); line-height: 2.1; padding: .1em .2em; direction: rtl; color: #f4efe2; text-shadow: 0 0 24px rgba(217, 180, 90, .28); }
   .nm-tr { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 8vw, 40px); line-height: 1.2; margin: 14px 0 0; color: #f4efe2; }
   .nm-fr { color: #d9b45a; font-weight: 700; font-size: 18px; margin: 4px 0 0; }
   .nm-fam { font-size: 12px; color: #9ba8c4; letter-spacing: .14em; text-transform: uppercase; margin-top: 8px; }
@@ -2812,21 +2812,55 @@ let nmIdx = Math.min(NOMS.length - 1, Math.max(0, Number(store.get("vc-noms", 0)
 let nmEcoute = false;
 let nmSession = 0;
 
-function nmParler(i, fin) {
+/* Récitation : fichier MP3 si l'index a une URL dans NOMS_AUDIO, sinon voix du navigateur. */
+const NOMS_AUDIO = []; // ex. NOMS_AUDIO[0] = "https://.../001-allah.mp3" ; vide = voix de secours
+let nmAudio = null;
+
+function nmStopAudio() {
+  if (nmAudio) { nmAudio.pause(); nmAudio = null; }
+}
+
+function nmVoix(lang) {
+  if (!("speechSynthesis" in window)) return null;
+  const voix = speechSynthesis.getVoices().filter((v) => v.lang && v.lang.toLowerCase().startsWith(lang));
+  return voix.find((v) => /premium|enhanced|natural|neural/i.test(v.name))
+    || voix.find((v) => /google|microsoft/i.test(v.name))
+    || voix[0] || null;
+}
+
+function nmDire(texte, lang, vitesse, fin) {
   if (!("speechSynthesis" in window)) return fin();
-  const [ar, tr, fr] = NOMS[i];
+  const u = new SpeechSynthesisUtterance(texte);
+  u.lang = lang;
+  u.rate = vitesse;
+  const voix = nmVoix(lang.slice(0, 2));
+  if (voix) u.voice = voix;
+  u.onend = () => fin();
+  u.onerror = () => fin();
+  speechSynthesis.speak(u);
+}
+
+function nmParler(i, fin) {
   const v = Number($("#nmVit").value) || 1;
-  const a = new SpeechSynthesisUtterance(ar);
-  a.lang = "ar-SA"; a.rate = 0.8 * v;
-  const f = new SpeechSynthesisUtterance(`${tr}. ${fr}.`);
-  f.lang = "fr-FR"; f.rate = 0.95 * v;
-  f.onend = () => fin(); f.onerror = () => fin();
-  speechSynthesis.speak(a);
-  speechSynthesis.speak(f);
+  const [ar, , fr] = NOMS[i];
+  const apresArabe = () => nmDire(fr, "fr-FR", 0.95 * v, fin);
+  const dire = () => nmDire(ar, "ar-SA", 0.8 * v, apresArabe);
+  const url = NOMS_AUDIO[i];
+  if (url) {
+    nmStopAudio();
+    nmAudio = new Audio(url);
+    nmAudio.playbackRate = v;
+    nmAudio.onended = apresArabe;
+    nmAudio.onerror = dire;
+    nmAudio.play().catch(dire);
+    return;
+  }
+  dire();
 }
 
 function nmLancer() {
   const s = ++nmSession;
+  nmStopAudio();
   nmEcoute = true; nmBouton();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   const suite = () => {
@@ -2843,6 +2877,7 @@ function nmLancer() {
 
 function nmArreter() {
   nmSession++; nmEcoute = false;
+  nmStopAudio();
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   nmBouton();
 }
